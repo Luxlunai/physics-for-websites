@@ -36,7 +36,7 @@
         }
 
         static remove(physicsObject) {
-            Physics.instance.objects = Physics.instance.objects.filter((e) => { return e === physicsObject; });
+            Physics.instance.objects = Physics.instance.objects.filter((o) => o !== physicsObject);
         }
 
         static collide(physicsObject, collidableObject) {
