@@ -1,0 +1,67 @@
+html,
+body {
+  width: 150px;
+  padding: 0;
+  margin: 0;
+  background-color:#112;
+  color: #fff;
+  font-family: 'Calibri', sans-serif;
+}
+
+div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+p {
+  padding: 0;
+  margin: 0;
+}
+
+.hidden {
+  display: none;
+}
+
+#popup-content {
+  padding: 10px 10px 10px 10px;
+  gap: 10px;
+}
+
+#error-content {
+  padding: 10px;
+  gap: 10px;
+}
+
+button {
+  color: #fff;
+  font-family: 'Calibri', sans-serif;
+  border: none;
+  text-align: center;
+  font-size: 1em;
+  cursor: pointer;
+  width: 100%;
+  padding: 8px;
+  border-radius: 5%;
+}
+
+button#enable-physics {
+  background-color: #946;
+  aspect-ratio: 1/1;
+  border-radius: 50%;
+}
+
+button#enable-physics:hover {
+  background-color: #b66;
+}
+
+button#reset {
+  background-color: #324;
+  padding: 4px;
+}
+
+button#reset:hover {
+  background-color: #437;
+}
+

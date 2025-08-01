@@ -1,0 +1,30 @@
+<svg 
+    xmlns="http://www.w3.org/2000/svg"
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    aria-hidden="true"
+    role="img"
+    preserveAspectRatio="xMidYMid meet"
+    viewBox="0 0 48 48"
+>
+    <g
+        stroke="white"
+        stroke-width="4px"
+        fill="transparent"
+    >
+        <path
+            d="M 2,30 L 38,46 L 46,28 L 10,12 Z" 
+        />
+        <line
+            x1="30"
+            y1="2"
+            x2="30"
+            y2="10"
+        ></line>
+        <line
+            x1="46"
+            y1="2"
+            x2="46"
+            y2="16"
+        ></line>
+    </g>
+</svg>

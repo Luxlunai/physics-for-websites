@@ -1,0 +1,19 @@
+{
+    "manifest_version": 2,
+    "name": "physics-for-websites",
+    "version": "1.0",
+
+    "description": "adds physics to websites",
+
+    "icons": {
+        "48": "icons/physics.svg"
+    },
+
+    "permissions": ["activeTab", "tabs"],
+
+    "browser_action": {
+        "default_icon": "icons/physics.svg",
+        "default_title": "physics-for-websites",
+        "default_popup": "popup/enable_physics.html"
+    }
+}
