@@ -14,7 +14,9 @@
     });
 
     let issetup, elements, clones;
-    let particle1, particle2, spring;
+    let vertex1, vertex2, vertex3, vertex4;
+    let edge1, edge2, edge3, edge4;
+    let v1Elem, v2Elem, v3Elem, v4Elem;
 
     function enablePhysics() {
         if (physics.loop.isRunning) { // if the loop is running, pause
@@ -31,24 +33,82 @@
     function resetPage() {
         physics.loop.stop();
         
+        physics.remove(vertex1);
+        physics.remove(vertex2);
+        physics.remove(vertex3);
+        physics.remove(vertex4);
+        physics.remove(edge1);
+        physics.remove(edge2);
+        physics.remove(edge3);
+        physics.remove(edge4);
+        v1Elem.remove();
+        v2Elem.remove();
+        v3Elem.remove();
+        v4Elem.remove();
+
         elements.forEach(element => { element.style.visibility = ""; });
         clones.forEach(clone => { clone.remove(); });
         issetup = false;
     }
 
     function setup() {
-        particle1 = physics.Particle(10, 10);
-        particle2 = physics.Particle(20, 10);
-        spring = physics.Spring(particle1, particle2, 10, 1);
-        particle1.velocity = physics.Vector(0, 5);
-        physics.add(particle1);
-        physics.add(particle2);
-        physics.add(spring);
+        vertex1 = physics.Particle(1200, 100);
+        vertex2 = physics.Particle(1450, 100);
+        vertex3 = physics.Particle(1450, 350);
+        vertex4 = physics.Particle(1200, 350);
+        edge1 = physics.Spring(vertex1, vertex2, 250, 1);
+        edge2 = physics.Spring(vertex2, vertex3, 250, 1);
+        edge3 = physics.Spring(vertex3, vertex4, 250, 1);
+        edge4 = physics.Spring(vertex4, vertex1, 250, 1);
+        vertex1.acceleration = physics.Vector(0, 2);
+        vertex2.acceleration = physics.Vector(0, 2);
+        vertex3.acceleration = physics.Vector(0, 2);
+        vertex4.acceleration = physics.Vector(0, 2);
+        physics.add(vertex1);
+        physics.add(vertex2);
+        physics.add(vertex3);
+        physics.add(vertex4);
+        physics.add(edge1);
+        physics.add(edge2);
+        physics.add(edge3);
+        physics.add(edge4);
+        physics.collide(vertex1, physics.window);
+        physics.collide(vertex2, physics.window);
+        physics.collide(vertex3, physics.window);
+        physics.collide(vertex4, physics.window);
+
+        v1Elem = document.createElement('div');
+        v1Elem.classList.add('particle');
+        v1Elem.style.left = `${vertex1.position.x}px`;
+        v1Elem.style.top = `${vertex1.position.y}px`;
+
+        v2Elem = v1Elem.cloneNode();
+        v2Elem.style.left = `${vertex2.position.x}px`; 
+        v2Elem.style.top = `${vertex2.position.y}px`;
+
+        v3Elem = v1Elem.cloneNode();
+        v3Elem.style.left = `${vertex3.position.x}px`; 
+        v3Elem.style.top = `${vertex3.position.y}px`;
         
-        console.log(particle1.position, particle2.position, particle1.position.dist(particle2.position));
+        v4Elem = v1Elem.cloneNode();
+        v4Elem.style.left = `${vertex4.position.x}px`; 
+        v4Elem.style.top = `${vertex4.position.y}px`;
 
+        document.body.append(v1Elem);
+        document.body.append(v2Elem);
+        document.body.append(v3Elem);
+        document.body.append(v4Elem);
 
-
+        physics.loop.onUpdate(() => {
+            v1Elem.style.left = `${vertex1.position.x}px`;
+            v1Elem.style.top = `${vertex1.position.y}px`;
+            v2Elem.style.left = `${vertex2.position.x}px`;
+            v2Elem.style.top = `${vertex2.position.y}px`;
+            v3Elem.style.left = `${vertex3.position.x}px`;
+            v3Elem.style.top = `${vertex3.position.y}px`;
+            v4Elem.style.left = `${vertex4.position.x}px`;
+            v4Elem.style.top = `${vertex4.position.y}px`;
+        })
         elements = findElements();
         clones = cloneElements(elements);
         issetup = true;
