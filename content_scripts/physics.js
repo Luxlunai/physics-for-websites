@@ -18,8 +18,8 @@
         }
 
         update() {
-            this.objects.forEach((e) => {
-                e.update();
+            this.objects.forEach((object) => {
+                object.update();
             });
             this.collisions.forEach((c) => {
                 c.collidableObject.colliders.forEach((collides) => {
@@ -36,7 +36,7 @@
         }
 
         static remove(physicsObject) {
-            Physics.instance.objects = Physics.instance.objects.filter((o) => o !== physicsObject);
+            Physics.instance.objects = Physics.instance.objects.filter((object) => object !== physicsObject);
         }
 
         static collide(physicsObject, collidableObject) {
