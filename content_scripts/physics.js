@@ -35,6 +35,10 @@
             Physics.instance.objects.push(physicsObject);
         }
 
+        static remove(physicsObject) {
+            Physics.instance.objects = Physics.instance.objects.filter((e) => { return e === physicsObject; });
+        }
+
         static collide(physicsObject, collidableObject) {
             Physics.instance.collisions.push({
                 physicsObject: physicsObject,
