@@ -50,9 +50,14 @@ function reportError(error) {
     "physics.Spring.js",
     "physics.window.js"
 ].forEach((fileName) => {
-    browser.tabs.executeScript({ file: "/content_scripts/" + fileName }).catch(reportError);
+    browser.tabs
+        .executeScript({ file: "/content_scripts/" + fileName })
+        .catch(reportError);
 });
 
+browser.tabs
+    .insertCSS({ file: "/content_scripts/main.css"})
+    .catch(reportError);
 browser.tabs
     .executeScript({ file: "/content_scripts/main.js" })
     .then(listenForClicks)
