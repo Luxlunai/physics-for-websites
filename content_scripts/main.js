@@ -15,7 +15,7 @@
 
     let issetup, elements, clones;
     let vertex1, vertex2, vertex3, vertex4;
-    let edge1, edge2, edge3, edge4;
+    let edge1, edge2, edge3, edge4, edge5, edge6;
     let v1Elem, v2Elem, v3Elem, v4Elem;
 
     function enablePhysics() {
@@ -41,6 +41,8 @@
         physics.remove(edge2);
         physics.remove(edge3);
         physics.remove(edge4);
+        physics.remove(edge5);
+        physics.remove(edge6);
         v1Elem.remove();
         v2Elem.remove();
         v3Elem.remove();
@@ -59,7 +61,11 @@
         edge1 = physics.Spring(vertex1, vertex2, 250, 1);
         edge2 = physics.Spring(vertex2, vertex3, 250, 1);
         edge3 = physics.Spring(vertex3, vertex4, 250, 1);
-        edge4 = physics.Spring(vertex4, vertex1, 250, 1);
+        edge3 = physics.Spring(vertex3, vertex4, 250, 1);
+        edge4 = physics.Spring(vertex3, vertex4, 250, 1);
+        edge5 = physics.Spring(vertex1, vertex3, Math.sqrt(250 ** 2 + 250 ** 2), 1);
+        edge6 = physics.Spring(vertex2, vertex4, Math.sqrt(250 ** 2 + 250 ** 2), 1);
+        console.log(edge6);
         vertex1.acceleration = physics.Vector(0, 2);
         vertex2.acceleration = physics.Vector(0, 2);
         vertex3.acceleration = physics.Vector(0, 2);
@@ -72,6 +78,8 @@
         physics.add(edge2);
         physics.add(edge3);
         physics.add(edge4);
+        physics.add(edge5);
+        physics.add(edge6);
         physics.collide(vertex1, physics.window);
         physics.collide(vertex2, physics.window);
         physics.collide(vertex3, physics.window);
