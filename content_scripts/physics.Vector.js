@@ -10,16 +10,13 @@
             this.y = y;
         }
 
-        add(x, y = null) {
-            if (physics.isVector(x)) {
-                this.x += x.x;
-                this.y += x.y;
-            } else if (typeof x === "number" && typeof y === "number") {
-                this.x += x;
-                this.y += y;
-            } else if (typeof x === "number" && !y) {
-                this.x += x;
-                this.y += x;
+        add(vector) {
+            if (physics.isVector(vector)) {
+                this.x += vector.x;
+                this.y += vector.y;
+            } else if (typeof vector === "number") {
+                this.x += vector;
+                this.y += vector;
             } else {
                 throw new Error("incorrect parameters in physics.Vector.add");
             }
@@ -27,19 +24,16 @@
         }
 
         sub(vector) {
-            return this.add(vector.negative);
+            return this.add(physics.isVector(vector) ? vector.negative : -vector);
         }
 
-        mult(x, y = null) {
-            if (physics.isVector(x)) {
-                this.x *= x.x;
-                this.y *= x.y;
-            } else if (typeof x === "number" && typeof y === "number") {
-                this.x *= x;
-                this.y *= y;
-            } else if (typeof x === "number" && !y) {
-                this.x *= x;
-                this.y *= x;
+        mult(vector) {
+            if (physics.isVector(vector)) {
+                this.x *= vector.x;
+                this.y *= vector.y;
+            } else if (typeof x === "number") {
+                this.x *= vector;
+                this.y *= vector;
             } else {
                 throw new Error("incorrect parameters in physics.Vector.mult");
             }
