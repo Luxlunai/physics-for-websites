@@ -10,36 +10,6 @@
             this.y = y;
         }
 
-        add(vector) {
-            if (physics.isVector(vector)) {
-                this.x += vector.x;
-                this.y += vector.y;
-            } else if (typeof vector === "number") {
-                this.x += vector;
-                this.y += vector;
-            } else {
-                throw new Error("incorrect parameters in physics.Vector.add");
-            }
-            return this;
-        }
-
-        sub(vector) {
-            return this.add(physics.isVector(vector) ? vector.negative : -vector);
-        }
-
-        mult(vector) {
-            if (physics.isVector(vector)) {
-                this.x *= vector.x;
-                this.y *= vector.y;
-            } else if (typeof x === "number") {
-                this.x *= vector;
-                this.y *= vector;
-            } else {
-                throw new Error("incorrect parameters in physics.Vector.mult");
-            }
-            return this;
-        }
-
         dist(vector) {
             if (physics.isVector(vector)) {
                 return this.copy.sub(vector).length;
@@ -53,6 +23,53 @@
             this.x /= length;
             this.y /= length;
             return this;
+        }
+
+        transform(translationVector, rotationAngle) {
+            return new PhysicsVector(
+                Math.cos(rotationAngle) * this.x - Math.sin(rotationAngle) * this.y + translationVector.x,
+                Math.sin(rotationAngle) * this.x + Math.cos(rotationAngle) * this.y + translationVector.y
+            );
+        }
+
+        add(vector) {
+            if (physics.isVector(vector)) {
+                return new PhysicsVector(
+                    this.x += vector.x,
+                    this.y += vector.y
+                );
+            } else if (typeof vector === "number") {
+                return new PhysicsVector(
+                    this.x += vector,
+                    this.y += vector
+                );
+            } else {
+                throw new Error("incorrect parameters in physics.Vector.add");
+            }
+        }
+
+        sub(vector) {
+            return this.add(physics.isVector(vector) ? vector.negative : -vector);
+        }
+
+        mult(vector) {
+            if (physics.isVector(vector)) {
+                return new PhysicsVector(
+                    this.x *= vector.x,
+                    this.y *= vector.y
+                );
+            } else if (typeof x === "number") {
+                return new PhysicsVector(
+                    this.x *= vector,
+                    this.y *= vector
+                );
+            } else {
+                throw new Error("incorrect parameters in physics.Vector.mult");
+            }
+        }
+
+        div(vector) {
+            return this.add(physics.isVector(vector) ? vector.percentile : 1 / vector);
         }
 
         get copy() {
