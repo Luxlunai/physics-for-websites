@@ -11,7 +11,6 @@
 
                 let edge = v2.sub(v1);
                 let axis = edge.orthogonal;
-                console.log(edge, axis);
 
                 let min1 = Infinity;
                 let max1 = -Infinity;
