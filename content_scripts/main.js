@@ -14,9 +14,8 @@
     });
 
     let issetup, elements, clones;
-    let vertex1, vertex2, vertex3, vertex4;
-    let edge1, edge2, edge3, edge4, edge5, edge6;
-    let v1Elem, v2Elem, v3Elem, v4Elem;
+    let rect1, rect1Elem, rect1VertexElems;
+    let rect2, rect2Elem, rect2VertexElems;
 
     function enablePhysics() {
         if (physics.loop.isRunning) { // if the loop is running, pause
@@ -32,93 +31,79 @@
 
     function resetPage() {
         physics.loop.stop();
-        
-        physics.remove(vertex1);
-        physics.remove(vertex2);
-        physics.remove(vertex3);
-        physics.remove(vertex4);
-        physics.remove(edge1);
-        physics.remove(edge2);
-        physics.remove(edge3);
-        physics.remove(edge4);
-        physics.remove(edge5);
-        physics.remove(edge6);
-        v1Elem.remove();
-        v2Elem.remove();
-        v3Elem.remove();
-        v4Elem.remove();
+        // rectElem1.remove();
+        rect1VertexElems.forEach((e) => {
+            e.remove();
+        })
+        rect2VertexElems.forEach((e) => {
+            e.remove();
+        })
 
-        elements.forEach(element => { element.style.visibility = ""; });
-        clones.forEach(clone => { clone.remove(); });
+        // elements.forEach(element => { element.style.visibility = ""; });
+        // clones.forEach(clone => { clone.remove(); });
         issetup = false;
     }
 
     function setup() {
-        vertex1 = physics.Particle(1200, 100);
-        vertex2 = physics.Particle(1450, 100);
-        vertex3 = physics.Particle(1450, 350);
-        vertex4 = physics.Particle(1200, 350);
-        edge1 = physics.Spring(vertex1, vertex2, 250, 1);
-        edge2 = physics.Spring(vertex2, vertex3, 250, 1);
-        edge3 = physics.Spring(vertex3, vertex4, 250, 1);
-        edge3 = physics.Spring(vertex3, vertex4, 250, 1);
-        edge4 = physics.Spring(vertex3, vertex4, 250, 1);
-        edge5 = physics.Spring(vertex1, vertex3, Math.sqrt(250 ** 2 + 250 ** 2), 1);
-        edge6 = physics.Spring(vertex2, vertex4, Math.sqrt(250 ** 2 + 250 ** 2), 1);
-        console.log(edge6);
-        vertex1.acceleration = physics.Vector(0, 2);
-        vertex2.acceleration = physics.Vector(0, 2);
-        vertex3.acceleration = physics.Vector(0, 2);
-        vertex4.acceleration = physics.Vector(0, 2);
-        physics.add(vertex1);
-        physics.add(vertex2);
-        physics.add(vertex3);
-        physics.add(vertex4);
-        physics.add(edge1);
-        physics.add(edge2);
-        physics.add(edge3);
-        physics.add(edge4);
-        physics.add(edge5);
-        physics.add(edge6);
-        physics.collide(vertex1, physics.window);
-        physics.collide(vertex2, physics.window);
-        physics.collide(vertex3, physics.window);
-        physics.collide(vertex4, physics.window);
+        rect1 = physics.BodyRect(physics.Vector(200, 500), 200, 200);
+        rect2 = physics.BodyRect(physics.Vector(2000, 500), 200, 200);
 
-        v1Elem = document.createElement('div');
-        v1Elem.classList.add('particle');
-        v1Elem.style.left = `${vertex1.position.x}px`;
-        v1Elem.style.top = `${vertex1.position.y}px`;
+        // rectElem1 = document.createElement('div');
+        // rectElem1.classList.add('physics-body-rect');
+        // document.body.append(rectElem1);
 
-        v2Elem = v1Elem.cloneNode();
-        v2Elem.style.left = `${vertex2.position.x}px`; 
-        v2Elem.style.top = `${vertex2.position.y}px`;
+        rect1VertexElems = [];
+        rect1.vertices.forEach((v, i) => {
+            rect1VertexElems.push(document.createElement('div'));
+            rect1VertexElems[rect1VertexElems.length - 1].classList.add('particle');
+            document.body.append(rect1VertexElems[i]);
+        })
 
-        v3Elem = v1Elem.cloneNode();
-        v3Elem.style.left = `${vertex3.position.x}px`; 
-        v3Elem.style.top = `${vertex3.position.y}px`;
-        
-        v4Elem = v1Elem.cloneNode();
-        v4Elem.style.left = `${vertex4.position.x}px`; 
-        v4Elem.style.top = `${vertex4.position.y}px`;
-
-        document.body.append(v1Elem);
-        document.body.append(v2Elem);
-        document.body.append(v3Elem);
-        document.body.append(v4Elem);
+        rect2VertexElems = [];
+        rect2.vertices.forEach((v, i) => {
+            rect2VertexElems.push(document.createElement('div'));
+            rect2VertexElems[rect2VertexElems.length - 1].classList.add('particle');
+            document.body.append(rect2VertexElems[i]);
+        })
 
         physics.loop.onUpdate(() => {
-            v1Elem.style.left = `${vertex1.position.x}px`;
-            v1Elem.style.top = `${vertex1.position.y}px`;
-            v2Elem.style.left = `${vertex2.position.x}px`;
-            v2Elem.style.top = `${vertex2.position.y}px`;
-            v3Elem.style.left = `${vertex3.position.x}px`;
-            v3Elem.style.top = `${vertex3.position.y}px`;
-            v4Elem.style.left = `${vertex4.position.x}px`;
-            v4Elem.style.top = `${vertex4.position.y}px`;
+            let vertices1 = rect1.getTransformedVertices();
+            vertices1.forEach((v, i) => {
+                rect1VertexElems[i].style.left = v.x + 'px';
+                rect1VertexElems[i].style.top = v.y + 'px';
+            })
+
+            let vertices2 = rect2.getTransformedVertices();
+            vertices2.forEach((v, i) => {
+                rect2VertexElems[i].style.left = v.x + 'px';
+                rect2VertexElems[i].style.top = v.y + 'px';
+            })
+
+            if(physics.Collisions.intersectPolygons(vertices1, vertices2)) {
+                rect1VertexElems.forEach((e) => {
+                    e.style.backgroundColor = "green";
+                })
+                rect2VertexElems.forEach((e) => {
+                    e.style.backgroundColor = "green";
+                })
+            } else {
+                rect1VertexElems.forEach((e) => {
+                    e.style.backgroundColor = "red";
+                })
+                rect2VertexElems.forEach((e) => {
+                    e.style.backgroundColor = "red";
+                })
+            }
+
+            rect1.rotation += 0.01;
+            rect1.position.x += 5;
+
+            rect2.rotation += 0.01;
+            rect2.position.x -= 5;
+
         })
-        elements = findElements();
-        clones = cloneElements(elements);
+        // elements = findElements();
+        // clones = cloneElements(elements);
         issetup = true;
     }
 

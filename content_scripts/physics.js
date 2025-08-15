@@ -5,6 +5,7 @@
         static Loop;
         static Vector;
         static Particle;
+        static Collisions;
         static window;
 
         static _instance;
@@ -14,22 +15,22 @@
         collisions = [];
 
         constructor() {
-            this.loop = Physics.Loop(this.update.bind(this));
+            this.loop = Physics.Loop(() => {});
         }
 
-        update() {
-            this.objects.forEach((object) => {
-                object.update();
-            });
-            this.collisions.forEach((c) => {
-                c.collidableObject.colliders.forEach((collides) => {
-                    let vector = collides(c.physicsObject.x, c.physicsObject.y);
-                    if (vector) {
-                        c.physicsObject.velocity.mult(vector);
-                    }
-                }) 
-            });
-        }
+        // update() {
+        //     this.objects.forEach((object) => {
+        //         object.update();
+        //     });
+        //     this.collisions.forEach((c) => {
+        //         c.collidableObject.colliders.forEach((collides) => {
+        //             let vector = collides(c.physicsObject.x, c.physicsObject.y);
+        //             if (vector) {
+        //                 c.physicsObject.velocity.mult(vector);
+        //             }
+        //         }) 
+        //     });
+        // }
 
         static add(physicsObject) {
             Physics.instance.objects.push(physicsObject);

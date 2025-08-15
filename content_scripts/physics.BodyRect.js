@@ -2,51 +2,59 @@
     if (window.hasRun) return;
     
     class PhysicsBodyRect {
+        static class = PhysicsBodyRect;
 
-        verteces = [];
+        position = physics.Vector(); //physics.Vector
+        width = 0; //float
+        height = 0; //float
+        density = 0; //float
+        restitution = 0; //float
+        isStatic = false; //bool
 
-        htmlElement;
+        linearVelocity = physics.Vector(); //physics.Vector
+        rotation = 0; //float
+        rotationalVelocity = 0; //float
 
-        constructor(x, y, width, height) {
+        mass = 0; //float
+        area = 0; //float
 
-            this.verteces[0] = physics.Particle(x, y);
-            this.verteces[1] = physics.Particle(x + width, y);
-            this.verteces[2] = physics.Particle(x + width, y + height);
-            this.verteces[3] = physics.Particle(x, y + height);
+        vertices = []; //physics.Vector[]
+        transformedVertices = []; //physics.Vector[]
 
-            this.springs[0] = physics.Spring(this.vertex[0], this.vertex[1], width, 1);
-            this.springs[1] = physics.Spring(this.vertex[1], this.vertex[2], height, 1);
-            this.springs[2] = physics.Spring(this.vertex[2], this.vertex[3], width, 1);
-            this.springs[3] = physics.Spring(this.vertex[3], this.vertex[0], height, 1);
+        transformUpdateRequired = false; //bool
 
-            this.verteces.forEach((particle) => { particle.acceleration = physics.Vector(0, 5); });
+        constructor(position, width, height, density = 1, restitution = 1, isStatic = false) {
+            this.position = position;
+            this.width = width;
+            this.height = height
+            this.density = density;
+            this.restitution = restitution;
+
+            this.isStatic = isStatic;
+
+            this.area = this.width * this.height;
+            this.mass = this.area * this.density;
+
+            this.vertices = [
+                physics.Vector(-this.width / 2, -this.height / 2), //top-left
+                physics.Vector(this.width / 2, -this.height / 2), //top-right
+                physics.Vector(this.width / 2, this.height / 2), //bottom-right
+                physics.Vector(-this.width / 2, this.height / 2), //bottom-left
+            ]
+            this.transformUpdateRequired = true;
         }
 
-        update() {
-            this.verteces.forEach((particle) => {
-                particle.update();
-            });
-            this.springs.forEach((spring) => {
-                spring.update();
-            });
-        }
-
-        get x() {
-            return this.position.x;
-        }
-
-        set x(value) {
-            this.position.x = value;
-        }
-
-        get y() {
-            return this.position.y;
-        }
-
-        set y(value) {
-            this.position.y = value;
+        getTransformedVertices() {
+            if(this.transformUpdateRequired) {
+                this.vertices.forEach((v, i) => {
+                    this.transformedVertices[i] = v.transform(this.position, this.rotation)
+                })
+            }
+            return this.transformedVertices;
         }
     }
 
-    window.physics.BodyRect = (x, y) => { return new PhysicsBodyRect(x, y, width, height); };
+    window.physics.BodyRect = (position, width, height, density, restitution, isStatic) => { 
+        return new PhysicsBodyRect(position, width, height, density, restitution, isStatic ); 
+    };
 })();

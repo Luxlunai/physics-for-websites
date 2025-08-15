@@ -46,6 +46,8 @@ function reportError(error) {
     "physics.js",
     "physics.Loop.js",
     "physics.Vector.js",
+    "physics.Collisions.js",
+    "physics.BodyRect.js",
     "physics.Particle.js",
     "physics.Spring.js",
     "physics.window.js"
