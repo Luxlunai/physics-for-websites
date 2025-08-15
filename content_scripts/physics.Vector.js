@@ -33,19 +33,10 @@
         }
 
         add(vector) {
-            if (physics.isVector(vector)) {
-                return new PhysicsVector(
-                    this.x += vector.x,
-                    this.y += vector.y
-                );
-            } else if (typeof vector === "number") {
-                return new PhysicsVector(
-                    this.x += vector,
-                    this.y += vector
-                );
-            } else {
-                throw new Error("incorrect parameters in physics.Vector.add");
-            }
+            return new PhysicsVector(
+                this.x + vector.x,
+                this.y + vector.y
+            );
         }
 
         sub(vector) {
@@ -53,23 +44,18 @@
         }
 
         mult(vector) {
-            if (physics.isVector(vector)) {
-                return new PhysicsVector(
-                    this.x *= vector.x,
-                    this.y *= vector.y
-                );
-            } else if (typeof x === "number") {
-                return new PhysicsVector(
-                    this.x *= vector,
-                    this.y *= vector
-                );
-            } else {
-                throw new Error("incorrect parameters in physics.Vector.mult");
-            }
+            return new PhysicsVector(
+                this.x * vector.x,
+                this.y * vector.y
+            );
         }
 
         div(vector) {
             return this.add(physics.isVector(vector) ? vector.percentile : 1 / vector);
+        }
+
+        dot(vector) {
+            return this.x * vector.x + this.y * vector.y; 
         }
 
         get copy() {
@@ -94,7 +80,7 @@
 
         get normal() {
             let length = this.length;
-            return new PhysicsVector(this.x /= length, this.y /= length);
+            return new PhysicsVector(this.x / length, this.y / length);
         }
 
         get orthogonal() {
