@@ -5,6 +5,7 @@
         static Loop;
         static Vector;
         static Particle;
+        static BodyRect;
         static Collisions;
         static window;
 
