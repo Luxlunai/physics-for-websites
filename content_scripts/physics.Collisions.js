@@ -82,7 +82,25 @@
             depth /= normal.length;
             normal.normalize();
 
+            let centerVertices1 = PhysicsCollisions.getCenter(vertices1);
+            let centerVertices2 = PhysicsCollisions.getCenter(vertices2);
+            let direction = centerVertices2.sub(centerVertices1);
+
+            if (direction.dot(normal) < 0) {
+               normal = normal.negative; 
+            }
+
             return {"depth": depth, "normal": normal};
+        }
+
+        static getCenter(vertices) {
+            let sumX = 0;
+            let sumY = 0;
+            vertices.forEach((vertex) => {
+                sumX += vertex.x;
+                sumY += vertex.y;
+            });
+            return physics.Vector(sumX / vertices.length, sumY / vertices.length);
         }
     }
 
