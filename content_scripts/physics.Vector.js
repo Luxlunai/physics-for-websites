@@ -98,6 +98,7 @@
 
         get normal() {
             let length = this.length;
+            if (!length) return new PhysicsVector(0, 0);
             return new PhysicsVector(this.x / length, this.y / length);
         }
 
