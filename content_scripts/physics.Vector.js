@@ -14,7 +14,7 @@
             if (physics.isVector(vector)) {
                 return this.copy.sub(vector).length;
             } else {
-                throw new Error("incorrect parameter in physics.Vector.sub");
+                throw new Error("incorrect value in physics.Vector.dist: " + JSON.stringify(vector));
             }
         }
 
@@ -44,7 +44,7 @@
                     this.y + vector
                 );
             } else {
-                throw new Error("incorrect parameters in physics.Vector.add");
+                throw new Error("incorrect value in physics.Vector.add: " + JSON.stringify(vector));
             }
         }
 
@@ -58,13 +58,13 @@
                     this.x * vector.x,
                     this.y * vector.y
                 );
-            } else if (typeof x === "number") {
+            } else if (typeof vector === "number") {
                 return new PhysicsVector(
                     this.x * vector,
                     this.y * vector
                 );
             } else {
-                throw new Error("incorrect parameters in physics.Vector.mult");
+                throw new Error("incorrect value in physics.Vector.mult: " + JSON.stringify(vector));
             }
         }
 
