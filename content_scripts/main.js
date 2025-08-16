@@ -14,8 +14,15 @@
     });
 
     let issetup, elements, clones;
-    let rect1, rect1Elem, rect1VertexElems;
-    let rect2, rect2Elem, rect2VertexElems;
+    let rects = [];
+    let dir = { 
+        x: physics.Vector(0,0),
+        y: physics.Vector(0,0),
+        up: 0,
+        down: 0,
+        left: 0,
+        right: 0
+    };
 
     function enablePhysics() {
         if (physics.loop.isRunning) { // if the loop is running, pause
@@ -32,12 +39,10 @@
     function resetPage() {
         physics.loop.reset();
         
-        rect1VertexElems.forEach((e) => {
-            e.remove();
-        })
-        rect2VertexElems.forEach((e) => {
-            e.remove();
-        })
+        rects.forEach((rect) => {
+            rect.htmlElem.remove();
+        });
+        rects = [];
 
         // elements.forEach(element => { element.style.visibility = ""; });
         // clones.forEach(clone => { clone.remove(); });
@@ -45,59 +50,75 @@
     }
 
     function setup() {
-        rect1 = physics.BodyRect(physics.Vector(200, 500), 200, 200);
-        rect2 = physics.BodyRect(physics.Vector(2000, 500), 200, 200);
-
-        rect1VertexElems = [];
-        rect1.vertices.forEach((v, i) => {
-            rect1VertexElems.push(document.createElement('div'));
-            rect1VertexElems[rect1VertexElems.length - 1].classList.add('particle');
-            document.body.append(rect1VertexElems[i]);
-        })
-
-        rect2VertexElems = [];
-        rect2.vertices.forEach((v, i) => {
-            rect2VertexElems.push(document.createElement('div'));
-            rect2VertexElems[rect2VertexElems.length - 1].classList.add('particle');
-            document.body.append(rect2VertexElems[i]);
-        })
+        numberRects = 8;
+        for (let i = 0; i < numberRects; i++) {
+            let rect = {
+                physicsElem: physics.BodyRect(physics.Vector(Math.random() * 1890, Math.random() * 1080), 100, 100),
+                htmlElem: document.createElement('div')
+            };
+            rect.htmlElem.classList.add('physics-body-rect');
+            rect.htmlElem.style.width = 100 + 'px';
+            rect.htmlElem.style.height = 100 + 'px';
+            document.body.append(rect.htmlElem);
+            rects.push(rect);
+        }
 
         physics.loop.onUpdate(() => {
-            let vertices1 = rect1.getTransformedVertices();
-            vertices1.forEach((v, i) => {
-                rect1VertexElems[i].style.left = v.x + 'px';
-                rect1VertexElems[i].style.top = v.y + 'px';
-            })
+            rects.forEach((rect) => {
+                rect.physicsElem.position = rect.physicsElem.position.add(rect.physicsElem.linearVelocity);
+                rect.transformedVertices = rect.physicsElem.getTransformedVertices();
+            });
 
-            let vertices2 = rect2.getTransformedVertices();
-            vertices2.forEach((v, i) => {
-                rect2VertexElems[i].style.left = v.x + 'px';
-                rect2VertexElems[i].style.top = v.y + 'px';
-            })
+            rects.forEach((rect, index) => {
+                for (let i = index + 1; i < rects.length; i++) {
+                    collision = physics.Collisions.intersectPolygons(rect.transformedVertices, rects[i].transformedVertices);
+                    if(collision) {
+                        rect.htmlElem.style.borderColor = "green";
+                        rects[i].htmlElem.style.borderColor = "green";
 
-            if(physics.Collisions.intersectPolygons(vertices1, vertices2)) {
-                rect1VertexElems.forEach((e) => {
-                    e.style.backgroundColor = "green";
-                })
-                rect2VertexElems.forEach((e) => {
-                    e.style.backgroundColor = "green";
-                })
-            } else {
-                rect1VertexElems.forEach((e) => {
-                    e.style.backgroundColor = "red";
-                })
-                rect2VertexElems.forEach((e) => {
-                    e.style.backgroundColor = "red";
-                })
-            }
+                        rect.physicsElem.position = rect.physicsElem.position.sub(collision.normal.mult(collision.depth / 2));
+                        rects[i].physicsElem.position = rects[i].physicsElem.position.add(collision.normal.mult(collision.depth / 2));
+                    } else {
+                        rect.htmlElem.style.borderColor = "";
+                        rects[i].htmlElem.style.borderColor = "";
+                    }
+                };
 
-            rect1.rotation += 0.01;
-            rect1.position.x += 5;
-
-            rect2.rotation += 0.01;
-            rect2.position.x -= 5;
-
+                rect.htmlElem.style.left = rect.physicsElem.position.x - rect.physicsElem.width / 2 + 'px';
+                rect.htmlElem.style.top = rect.physicsElem.position.y - rect.physicsElem.height / 2 + 'px';
+            });
         })
+
+        window.addEventListener("keydown", (event) => {
+            if      (event.key === "w") {
+                dir.up = -1;
+            }
+            else if (event.key === "s") {
+                dir.down = 1;
+            }
+            else if (event.key === "a") {
+                dir.left = -1;
+            }
+            else if (event.key === "d") {
+                dir.right = 1;
+            }
+            rects[0].physicsElem.linearVelocity = physics.Vector(dir.left + dir.right, dir.up + dir.down).normal.mult(5);
+        });
+        window.addEventListener("keyup", (event) => {
+            if      (event.key === "w") {
+                dir.up = 0;
+            }
+            else if (event.key === "s") {
+                dir.down = 0;
+            }
+            else if (event.key === "a") {
+                dir.left = 0;
+            }
+            else if (event.key === "d") {
+                dir.right = 0;
+            }
+            rects[0].physicsElem.linearVelocity = physics.Vector(dir.left + dir.right, dir.up + dir.down).normal.mult(5);
+        });
         // elements = findElements();
         // clones = cloneElements(elements);
         issetup = true;
