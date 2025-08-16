@@ -50,6 +50,7 @@
             this.isRunning = false;
             this.previousTime = 0.0;
             this.delta = 0.0;
+            this.callbacks = [];
         }
 
         /**

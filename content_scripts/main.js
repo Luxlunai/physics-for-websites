@@ -30,8 +30,8 @@
     }
 
     function resetPage() {
-        physics.loop.stop();
-        // rectElem1.remove();
+        physics.loop.reset();
+        
         rect1VertexElems.forEach((e) => {
             e.remove();
         })
@@ -47,10 +47,6 @@
     function setup() {
         rect1 = physics.BodyRect(physics.Vector(200, 500), 200, 200);
         rect2 = physics.BodyRect(physics.Vector(2000, 500), 200, 200);
-
-        // rectElem1 = document.createElement('div');
-        // rectElem1.classList.add('physics-body-rect');
-        // document.body.append(rectElem1);
 
         rect1VertexElems = [];
         rect1.vertices.forEach((v, i) => {
