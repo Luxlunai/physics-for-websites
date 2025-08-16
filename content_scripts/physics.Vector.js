@@ -33,10 +33,19 @@
         }
 
         add(vector) {
-            return new PhysicsVector(
-                this.x + vector.x,
-                this.y + vector.y
-            );
+            if (physics.isVector(vector)) {
+                return new PhysicsVector(
+                    this.x + vector.x,
+                    this.y + vector.y
+                );
+            } else if (typeof vector === "number") {
+                return new PhysicsVector(
+                    this.x + vector,
+                    this.y + vector
+                );
+            } else {
+                throw new Error("incorrect parameters in physics.Vector.add");
+            }
         }
 
         sub(vector) {
@@ -44,10 +53,19 @@
         }
 
         mult(vector) {
-            return new PhysicsVector(
-                this.x * vector.x,
-                this.y * vector.y
-            );
+            if (physics.isVector(vector)) {
+                return new PhysicsVector(
+                    this.x * vector.x,
+                    this.y * vector.y
+                );
+            } else if (typeof x === "number") {
+                return new PhysicsVector(
+                    this.x * vector,
+                    this.y * vector
+                );
+            } else {
+                throw new Error("incorrect parameters in physics.Vector.mult");
+            }
         }
 
         div(vector) {
