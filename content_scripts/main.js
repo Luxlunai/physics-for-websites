@@ -15,14 +15,16 @@
 
     let issetup, elements, clones;
     let rects = [];
-    let dir = { 
-        x: physics.Vector(0,0),
-        y: physics.Vector(0,0),
+    let dir = {
         up: 0,
         down: 0,
         left: 0,
         right: 0
     };
+    let rot = {
+        left: 0,
+        right: 0
+    }
 
     function enablePhysics() {
         if (physics.loop.isRunning) { // if the loop is running, pause
@@ -66,6 +68,7 @@
         physics.loop.onUpdate(() => {
             rects.forEach((rect) => {
                 rect.physicsElem.position = rect.physicsElem.position.add(rect.physicsElem.linearVelocity);
+                rect.physicsElem.rotation += rect.physicsElem.rotationalVelocity;
                 rect.transformedVertices = rect.physicsElem.getTransformedVertices();
             });
 
@@ -86,6 +89,7 @@
 
                 rect.htmlElem.style.left = rect.physicsElem.position.x - rect.physicsElem.width / 2 + 'px';
                 rect.htmlElem.style.top = rect.physicsElem.position.y - rect.physicsElem.height / 2 + 'px';
+                rect.htmlElem.style.transform = `rotate(${rect.physicsElem.rotation}rad)`
             });
         })
 
@@ -102,7 +106,14 @@
             else if (event.key === "d") {
                 dir.right = 1;
             }
+            else if (event.key === "q") {
+                rot.left = -1;
+            }
+            else if (event.key === "e") {
+                rot.right = 1;
+            }
             rects[0].physicsElem.linearVelocity = physics.Vector(dir.left + dir.right, dir.up + dir.down).normal.mult(5);
+            rects[0].physicsElem.rotationalVelocity = (rot.left + rot.right) / 360 * Math.PI * 2;
         });
         window.addEventListener("keyup", (event) => {
             if      (event.key === "w") {
@@ -117,7 +128,14 @@
             else if (event.key === "d") {
                 dir.right = 0;
             }
+            else if (event.key === "q") {
+                rot.left = 0;
+            }
+            else if (event.key === "e") {
+                rot.right = 0;
+            }
             rects[0].physicsElem.linearVelocity = physics.Vector(dir.left + dir.right, dir.up + dir.down).normal.mult(5);
+            rects[0].physicsElem.rotationalVelocity = (rot.left + rot.right) / 360 * Math.PI * 2;
         });
         // elements = findElements();
         // clones = cloneElements(elements);
