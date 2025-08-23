@@ -104,11 +104,11 @@
         }
 
         static resolveCollisions(body1, body2, normal, depth) {
-            relativeVelocity = body2.velocity.sub(body1.velocity);
+            let relativeVelocity = body2.velocity.sub(body1.velocity);
             let e = Math.min(body1.restitution, body2.restitution);
             let j = -(1 + e) * relativeVelocity.dot(normal);
             j /= (1/body1.mass) + (1/body2.mass);
-            
+
             body1.velocity = body1.velocity.add(normal.mult(j / body1.mass))
             body1.velocity = body1.velocity.sub(normal.mult(j / body2.mass))
         }
