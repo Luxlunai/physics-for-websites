@@ -20,7 +20,7 @@
         area = 0; //float
 
         vertices = []; //physics.Vector[]
-        transformedVertices = []; //physics.Vector[]
+        _transformedVertices = []; //physics.Vector[]
 
         transformUpdateRequired = false; //bool
 
@@ -45,19 +45,21 @@
             this.transformUpdateRequired = true;
         }
 
-        getTransformedVertices() {
-            if(this.transformUpdateRequired) {
-                this.vertices.forEach((v, i) => {
-                    this.transformedVertices[i] = v.transform(this.position, this.rotation)
-                })
-            }
-            return this.transformedVertices;
-        }
-
         update() {
             this.velocity = this.velocity.add(this.acceleration);
             this.position = this.position.add(this.velocity);
             this.rotation += this.rotationalVelocity;
+            this.transformUpdateRequired = true;
+        }
+
+        get transformedVertices() {
+            if(this.transformUpdateRequired) {
+                this.vertices.forEach((v, i) => {
+                    this._transformedVertices[i] = v.transform(this.position, this.rotation)
+                })
+                this.transformUpdateRequired = false;
+            }
+            return this._transformedVertices;
         }
     }
 
