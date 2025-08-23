@@ -85,10 +85,10 @@
         
         key = new inputController();
         key.onChange(() => {
-            rects[0].physicsElem.velocity = physics.Vector(
+            rects[0].physicsElem.acceleration = physics.Vector(
                 key.left && key.right ? 0 : key.left ? -1 : key.right ? 1 : 0,
                 key.up && key.down ? 0 : key.up ? -1 : key.down ? 1 : 0,
-            ).normal.mult(5);
+            ).normal.mult(0.5);
             rects[0].physicsElem.rotationalVelocity = (key.rotateLeft && key.rotateRight ? 0 : key.rotateLeft ? -1 : key.rotateRight ? 1 : 0) / 360 * Math.PI * 2;
         });
        
