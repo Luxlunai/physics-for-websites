@@ -14,7 +14,9 @@
     });
 
     let issetup, elements, clones;
+    let windowBorders = [];
     let rects = [];
+
 
     function enablePhysics() {
         if (physics.loop.isRunning) { // if the loop is running, pause
@@ -32,7 +34,7 @@
         physics.loop.reset();
         
         rects.forEach((rect) => {
-            rect.htmlElem.remove();
+            rect.html.remove();
         });
         rects = [];
 
@@ -44,52 +46,55 @@
     function setup() {
         numberRects = 8;
         for (let i = 0; i < numberRects; i++) {
-            let rect = {
-                physicsElem: physics.BodyRect(physics.Vector(Math.random() * 1890, Math.random() * 1080), 100, 100),
-                htmlElem: document.createElement('div')
-            };
-            rect.htmlElem.classList.add('physics-body-rect');
-            rect.htmlElem.style.width = 100 + 'px';
-            rect.htmlElem.style.height = 100 + 'px';
-            document.body.append(rect.htmlElem);
-            rects.push(rect);
+            rects.push({
+                physics: physics.BodyRect(physics.Vector(Math.random() * 1890, Math.random() * 1080), 100, 100),
+                html: document.createElement('div')
+            });
+
+            rects[i].html.classList.add('physics-body-rect');
+            rects[i].html.style.width = 100 + 'px';
+            rects[i].html.style.height = 100 + 'px';
+            document.body.append(rects[i].html);
         }
 
         physics.loop.onUpdate(() => {
             rects.forEach((rect) => {
-                rect.physicsElem.update();
-                rect.transformedVertices = rect.physicsElem.getTransformedVertices();
+                rect.physics.update();
             });
 
             rects.forEach((rect, index) => {
+                // let windowCollision = physics.Collisions.intersectWindow(rect.physics);
+                // if (windowCollision) {
+                //     console.log("window collision");
+                // }
                 for (let i = index + 1; i < rects.length; i++) {
-                    collision = physics.Collisions.intersectPolygons(rect.transformedVertices, rects[i].transformedVertices);
+                    let collision = physics.Collisions.intersectPolygons(rect.physics.transformedVertices, rects[i].physics.transformedVertices);
                     if(collision) {
-                        rect.htmlElem.style.borderColor = "green";
-                        rects[i].htmlElem.style.borderColor = "green";
+                        rect.html.style.borderColor = "green";
+                        rects[i].html.style.borderColor = "green";
 
-                        rect.physicsElem.position = rect.physicsElem.position.sub(collision.normal.mult(collision.depth / 2));
-                        rects[i].physicsElem.position = rects[i].physicsElem.position.add(collision.normal.mult(collision.depth / 2));
-                        physics.Collisions.resolveCollisions(rect.physicsElem, rects[i].physicsElem, collision.normal, collision.depth);
+                        rect.physics.position = rect.physics.position.sub(collision.normal.mult(collision.depth / 2));
+                        rects[i].physics.position = rects[i].physics.position.add(collision.normal.mult(collision.depth / 2));
+                        physics.Collisions.resolveCollisions(rect.physics, rects[i].physics, collision.normal, collision.depth);
                     } else {
-                        rect.htmlElem.style.borderColor = "";
-                        rects[i].htmlElem.style.borderColor = "";
+                        rect.html.style.borderColor = "";
+                        rects[i].html.style.borderColor = "";
                     }
                 };
 
-                rect.htmlElem.style.left = rect.physicsElem.position.x - rect.physicsElem.width / 2 + 'px';
-                rect.htmlElem.style.top = rect.physicsElem.position.y - rect.physicsElem.height / 2 + 'px';
-                rect.htmlElem.style.transform = `rotate(${rect.physicsElem.rotation}rad)`
+                rect.html.style.left = rect.physics.position.x - rect.physics.width / 2 + 'px';
+                rect.html.style.top = rect.physics.position.y - rect.physics.height / 2 + 'px';
+                rect.html.style.transform = `rotate(${rect.physics.rotation}rad)`
             });
         })
         
         key = new inputController();
         key.onChange(() => {
-            rects[0].physicsElem.acceleration = physics.Vector(
+            rects[0].physics.acceleration = physics.Vector(
                 key.left && key.right ? 0 : key.left ? -1 : key.right ? 1 : 0,
                 key.up && key.down ? 0 : key.up ? -1 : key.down ? 1 : 0,
             ).normal.mult(0.5);
-            rects[0].physicsElem.rotationalVelocity = (key.rotateLeft && key.rotateRight ? 0 : key.rotateLeft ? -1 : key.rotateRight ? 1 : 0) / 360 * Math.PI * 2;
+            rects[0].physics.rotationalVelocity = (key.rotateLeft && key.rotateRight ? 0 : key.rotateLeft ? -1 : key.rotateRight ? 1 : 0) / 360 * Math.PI * 2;
         });
        
         issetup = true;
