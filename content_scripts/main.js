@@ -63,10 +63,10 @@
             });
 
             rects.forEach((rect, index) => {
-                // let windowCollision = physics.Collisions.intersectWindow(rect.physics);
-                // if (windowCollision) {
-                //     console.log("window collision");
-                // }
+                let windowCollision = physics.Collisions.intersectWindow(rect.physics.transformedVertices);
+                if (windowCollision) {
+                    physics.Collisions.resolveWindow(rect.physics, windowCollision.normal);
+                }
                 for (let i = index + 1; i < rects.length; i++) {
                     let collision = physics.Collisions.intersectPolygons(rect.physics.transformedVertices, rects[i].physics.transformedVertices);
                     if(collision) {
@@ -75,7 +75,7 @@
 
                         rect.physics.position = rect.physics.position.sub(collision.normal.mult(collision.depth / 2));
                         rects[i].physics.position = rects[i].physics.position.add(collision.normal.mult(collision.depth / 2));
-                        physics.Collisions.resolveCollisions(rect.physics, rects[i].physics, collision.normal, collision.depth);
+                        physics.Collisions.resolvePolygons(rect.physics, rects[i].physics, collision.normal, collision.depth);
                     } else {
                         rect.html.style.borderColor = "";
                         rects[i].html.style.borderColor = "";

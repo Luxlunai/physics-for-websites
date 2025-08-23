@@ -4,6 +4,32 @@
     class PhysicsCollisions {
         constructor() {}
 
+        static intersectWindow(vertices) {
+            let normal;
+            let depth = Infinity;
+
+            for (let i = 0; i < vertices.length; i++) {
+                if(vertices[i].x < 0) {
+                    return { normal: physics.Vector(-1, 0) };
+                } else if (vertices[i].x > window.innerWidth) {
+                    return { normal: physics.Vector(1, 0) };
+                } else if (vertices[i].y < 0) {
+                    return { normal: physics.Vector(0, -1) };
+                } else if (vertices[i].y > window.innerHeight){
+                    return { normal: physics.Vector(0, 1) };
+                }
+            }
+            return false;
+        }
+
+        static resolveWindow(body, normal) {
+            let e = body.restitution;
+            let j = -(1 + e) * body.velocity.negative.dot(normal);
+            j /= (1 / body.mass);
+
+            body.velocity = body.velocity.sub(normal.mult(j / body.mass));
+        }
+
         static intersectPolygons(vertices1, vertices2) {
 
             let normal;
@@ -103,7 +129,7 @@
             return physics.Vector(sumX / vertices.length, sumY / vertices.length);
         }
 
-        static resolveCollisions(body1, body2, normal, depth) {
+        static resolvePolygons(body1, body2, normal, depth) {
             let relativeVelocity = body2.velocity.sub(body1.velocity);
             let e = Math.min(body1.restitution, body2.restitution);
             let j = -(1 + e) * relativeVelocity.dot(normal);
