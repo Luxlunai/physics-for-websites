@@ -11,7 +11,8 @@
         restitution = 0; //float
         isStatic = false; //bool
 
-        linearVelocity = physics.Vector(); //physics.Vector
+        velocity = physics.Vector(); //physics.Vector
+        acceleration = physics.Vector(); //physics.Vector
         rotation = 0; //float
         rotationalVelocity = 0; //float
 
@@ -51,6 +52,12 @@
                 })
             }
             return this.transformedVertices;
+        }
+
+        update(steps = 1) {
+            this.velocity = this.velocity.add(this.acceleration.mult(steps));
+            this.position = this.position.add(this.velocity.mult(steps));
+            this.rotation += this.rotationalVelocity * steps;
         }
     }
 
