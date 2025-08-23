@@ -15,16 +15,6 @@
 
     let issetup, elements, clones;
     let rects = [];
-    let dir = {
-        up: 0,
-        down: 0,
-        left: 0,
-        right: 0
-    };
-    let rot = {
-        left: 0,
-        right: 0
-    }
 
     function enablePhysics() {
         if (physics.loop.isRunning) { // if the loop is running, pause
@@ -67,8 +57,7 @@
 
         physics.loop.onUpdate(() => {
             rects.forEach((rect) => {
-                rect.physicsElem.position = rect.physicsElem.position.add(rect.physicsElem.linearVelocity);
-                rect.physicsElem.rotation += rect.physicsElem.rotationalVelocity;
+                rect.physicsElem.update();
                 rect.transformedVertices = rect.physicsElem.getTransformedVertices();
             });
 
@@ -92,53 +81,17 @@
                 rect.htmlElem.style.transform = `rotate(${rect.physicsElem.rotation}rad)`
             });
         })
-
-        window.addEventListener("keydown", (event) => {
-            if      (event.key === "w") {
-                dir.up = -1;
-            }
-            else if (event.key === "s") {
-                dir.down = 1;
-            }
-            else if (event.key === "a") {
-                dir.left = -1;
-            }
-            else if (event.key === "d") {
-                dir.right = 1;
-            }
-            else if (event.key === "q") {
-                rot.left = -1;
-            }
-            else if (event.key === "e") {
-                rot.right = 1;
-            }
-            rects[0].physicsElem.linearVelocity = physics.Vector(dir.left + dir.right, dir.up + dir.down).normal.mult(5);
-            rects[0].physicsElem.rotationalVelocity = (rot.left + rot.right) / 360 * Math.PI * 2;
+        
+        key = new inputController();
+        key.onChange(() => {
+            rects[0].physicsElem.velocity = physics.Vector(
+                key.left && key.right ? 0 : key.left ? -1 : key.right ? 1 : 0,
+                key.up && key.down ? 0 : key.up ? -1 : key.down ? 1 : 0,
+            ).normal.mult(5);
+            rects[0].physicsElem.rotationalVelocity = (key.rotateLeft && key.rotateRight ? 0 : key.rotateLeft ? -1 : key.rotateRight ? 1 : 0) / 360 * Math.PI * 2;
+            console.log(key)
         });
-        window.addEventListener("keyup", (event) => {
-            if      (event.key === "w") {
-                dir.up = 0;
-            }
-            else if (event.key === "s") {
-                dir.down = 0;
-            }
-            else if (event.key === "a") {
-                dir.left = 0;
-            }
-            else if (event.key === "d") {
-                dir.right = 0;
-            }
-            else if (event.key === "q") {
-                rot.left = 0;
-            }
-            else if (event.key === "e") {
-                rot.right = 0;
-            }
-            rects[0].physicsElem.linearVelocity = physics.Vector(dir.left + dir.right, dir.up + dir.down).normal.mult(5);
-            rects[0].physicsElem.rotationalVelocity = (rot.left + rot.right) / 360 * Math.PI * 2;
-        });
-        // elements = findElements();
-        // clones = cloneElements(elements);
+       
         issetup = true;
     }
 

@@ -50,7 +50,8 @@ function reportError(error) {
     "physics.BodyRect.js",
     "physics.Particle.js",
     "physics.Spring.js",
-    "physics.window.js"
+    "physics.window.js",
+    "inputController.js",
 ].forEach((fileName) => {
     browser.tabs
         .executeScript({ file: "/content_scripts/" + fileName })
