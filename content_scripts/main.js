@@ -70,6 +70,7 @@
 
                         rect.physicsElem.position = rect.physicsElem.position.sub(collision.normal.mult(collision.depth / 2));
                         rects[i].physicsElem.position = rects[i].physicsElem.position.add(collision.normal.mult(collision.depth / 2));
+                        physics.Collisions.resolveCollisions(rect, rects[i], collision.normal, collision.depth);
                     } else {
                         rect.htmlElem.style.borderColor = "";
                         rects[i].htmlElem.style.borderColor = "";
@@ -89,7 +90,6 @@
                 key.up && key.down ? 0 : key.up ? -1 : key.down ? 1 : 0,
             ).normal.mult(5);
             rects[0].physicsElem.rotationalVelocity = (key.rotateLeft && key.rotateRight ? 0 : key.rotateLeft ? -1 : key.rotateRight ? 1 : 0) / 360 * Math.PI * 2;
-            console.log(key)
         });
        
         issetup = true;
