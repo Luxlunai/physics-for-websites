@@ -70,7 +70,7 @@
 
                         rect.physicsElem.position = rect.physicsElem.position.sub(collision.normal.mult(collision.depth / 2));
                         rects[i].physicsElem.position = rects[i].physicsElem.position.add(collision.normal.mult(collision.depth / 2));
-                        physics.Collisions.resolveCollisions(rect, rects[i], collision.normal, collision.depth);
+                        physics.Collisions.resolveCollisions(rect.physicsElem, rects[i].physicsElem, collision.normal, collision.depth);
                     } else {
                         rect.htmlElem.style.borderColor = "";
                         rects[i].htmlElem.style.borderColor = "";
