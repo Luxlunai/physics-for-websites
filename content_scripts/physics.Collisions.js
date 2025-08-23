@@ -109,8 +109,8 @@
             let j = -(1 + e) * relativeVelocity.dot(normal);
             j /= (1/body1.mass) + (1/body2.mass);
 
-            body1.velocity = body1.velocity.add(normal.mult(j / body1.mass))
-            body1.velocity = body1.velocity.sub(normal.mult(j / body2.mass))
+            body1.velocity = body1.velocity.sub(normal.mult(j / body1.mass));
+            body2.velocity = body2.velocity.add(normal.mult(j / body2.mass));
         }
     }
 
