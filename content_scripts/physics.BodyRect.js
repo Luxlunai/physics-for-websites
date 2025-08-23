@@ -54,10 +54,10 @@
             return this.transformedVertices;
         }
 
-        update(steps = 1) {
-            this.velocity = this.velocity.add(this.acceleration.mult(steps));
-            this.position = this.position.add(this.velocity.mult(steps));
-            this.rotation += this.rotationalVelocity * steps;
+        update() {
+            this.velocity = this.velocity.add(this.acceleration);
+            this.position = this.position.add(this.velocity);
+            this.rotation += this.rotationalVelocity;
         }
     }
 
