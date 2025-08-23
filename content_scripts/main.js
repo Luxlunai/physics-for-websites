@@ -44,16 +44,21 @@
     }
 
     function setup() {
-        numberRects = 8;
+        let numberRects = 20;
+        let widthRects = 50;
+        let heightRects = 50;
         for (let i = 0; i < numberRects; i++) {
             rects.push({
-                physics: physics.BodyRect(physics.Vector(Math.random() * 1890, Math.random() * 1080), 100, 100),
+                width: widthRects,
+                height: heightRects,
+                physics: physics.BodyRect(physics.Vector(Math.random() * 1890, Math.random() * 1080), widthRects, heightRects),
                 html: document.createElement('div')
             });
 
+            rects[i].physics.rotation = Math.random() * Math.PI * 2;
             rects[i].html.classList.add('physics-body-rect');
-            rects[i].html.style.width = 100 + 'px';
-            rects[i].html.style.height = 100 + 'px';
+            rects[i].html.style.width = widthRects + 'px';
+            rects[i].html.style.height = heightRects + 'px';
             document.body.append(rects[i].html);
         }
 
