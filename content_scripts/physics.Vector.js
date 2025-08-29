@@ -12,7 +12,15 @@
 
         dist(vector) {
             if (physics.isVector(vector)) {
-                return this.copy.sub(vector).length;
+                return this.sub(vector).length;
+            } else {
+                throw new Error("incorrect value in physics.Vector.dist: " + JSON.stringify(vector));
+            }
+        }
+
+        distSq(vector) {
+            if (physics.isVector(vector)) {
+                return this.sub(vector).lengthSq;
             } else {
                 throw new Error("incorrect value in physics.Vector.dist: " + JSON.stringify(vector));
             }
@@ -76,8 +84,8 @@
             return this.x * vector.x + this.y * vector.y; 
         }
 
-        get copy() {
-            return new PhysicsVector(this.x, this.y);
+        approxeq(vector) {
+            return physics.approxeq(this.x, vector.x) && physics.approxeq(this.y, vector.y)
         }
 
         get string() {
@@ -93,7 +101,11 @@
         }
 
         get length() {
-            return Math.sqrt(this.x ** 2 + this.y ** 2);
+            return Math.sqrt(this.lengthSq);
+        }
+
+        get lengthSq() {
+            return this.x ** 2 + this.y ** 2;
         }
 
         get normal() {
