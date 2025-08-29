@@ -40,7 +40,7 @@
                 let v2 = vertices1[(i + 1) % vertices1.length];
 
                 let edge = v2.sub(v1);
-                let axis = edge.orthogonal;
+                let axis = edge.orthogonal.normal;
 
                 let min1 = Infinity;
                 let max1 = -Infinity;
@@ -75,7 +75,7 @@
                 let v2 = vertices2[(i + 1) % vertices2.length];
 
                 let edge = v2.sub(v1);
-                let axis = edge.orthogonal;
+                let axis = edge.orthogonal.normal;
 
                 let min2 = Infinity;
                 let max2 = -Infinity;
@@ -104,9 +104,6 @@
                     normal = axis;
                 }
             }
-
-            depth /= normal.length;
-            normal.normalize();
 
             let centerVertices1 = PhysicsCollisions.getCenter(vertices1);
             let centerVertices2 = PhysicsCollisions.getCenter(vertices2);
