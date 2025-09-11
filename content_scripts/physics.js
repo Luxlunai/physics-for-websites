@@ -16,7 +16,7 @@
         collisions = [];
 
         constructor() {
-            this.loop = Physics.Loop(() => {});
+            this.loop = Physics.Loop();
         }
 
         // update() {
@@ -52,7 +52,7 @@
             return typeof test === "object" && "x" in test && "y" in test;
         }
 
-        static approxeq(v1, v2, epsilon = 0.0005) { Math.abs(v1 - v2) <= epsilon };
+        static approxeq(v1, v2, epsilon = 0.001) { Math.abs(v1 - v2) <= epsilon };
 
         static get instance() {
             Physics._instance = Physics._instance || new Physics();

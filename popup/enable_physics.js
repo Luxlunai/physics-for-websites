@@ -43,6 +43,9 @@ function reportError(error) {
 }
 
 [
+    "HTMLCustomElement.js",
+    "HTMLPointElement.js",
+    "HTMLRectElement.js",
     "physics.js",
     "physics.Loop.js",
     "physics.Vector.js",

@@ -2,18 +2,6 @@
     if (window.hasRun) return;
     window.hasRun = true;
 
-    const createPointElement = (x, y, radius = 10, color = 'red') => {
-        let point = document.createElement('div');
-        point.classList.add('point');
-
-        point.style.left = x - radius / 2 + 'px';
-        point.style.top = y - radius / 2 + 'px';
-        point.style.width = radius + 'px';
-        point.style.height = radius + 'px';
-        point.style.backgroundColor = color;
-        return point;
-    }
-
     /**
      * Listen for messages from the background script.
      */
@@ -38,7 +26,7 @@
             physics.loop.start();
         } else {
             setup();
-            physics.loop.setSpeed(60);
+            physics.loop.setSpeed(30);
             physics.loop.start();
         }
     }
@@ -50,9 +38,10 @@
             rect.html.remove();
         });
         rects = [];
-
-        // elements.forEach(element => { element.style.visibility = ""; });
-        // clones.forEach(clone => { clone.remove(); });
+        contactPoints.forEach((e) => {
+            e.remove();
+        })
+        contactPoints = [];
         issetup = false;
     }
 
@@ -67,111 +56,91 @@
                 width: widthRects,
                 height: heightRects,
                 physics: physics.BodyRect(physics.Vector(randomX, randomY), widthRects, heightRects),
-                html: document.createElement('div')
+                html: document.createElement('physics-rect'),
+                collision: false
             });
 
             // rects[i].physics.rotation = Math.random() * Math.PI * 2;
             rects[i].physics.restitution = 0.7;
             rects[i].physics.acceleration = physics.Vector(0, 0.1);
-            rects[i].html.classList.add('physics-body-rect');
-            rects[i].html.style.width = widthRects + 'px';
-            rects[i].html.style.height = heightRects + 'px';
             document.body.append(rects[i].html);
+            rects[i].html.width = 50;
+            rects[i].html.height = 50;
         }
 
-        physics.loop.onUpdate(() => {
+        physics.loop.onUpdate(() => {   
             contactPoints.forEach((e) => {
                 e.remove();
             })
             contactPoints = [];
+        }, 5);
+
+        physics.loop.onUpdate(() => {
 
             rects.forEach((rect) => {
                 rect.physics.update();
+                rect.collision = false;
             });
 
             rects.forEach((rect, index) => {
                 let windowCollision = physics.Collisions.intersectWindow(rect.physics.transformedVertices);
+
                 if (windowCollision) {
-                    rect.physics.position = rect.physics.position.add(windowCollision.normal.mult(-windowCollision.depth));
+                    rect.physics.position = rect.physics.position.sub(windowCollision.normal.mult(windowCollision.depth));
                     physics.Collisions.resolveWindow(rect.physics, windowCollision.normal);
                 }
-                for (let i = index + 1; i < rects.length; i++) {
-                    let collision = physics.Collisions.intersectPolygons(rect.physics.transformedVertices, rects[i].physics.transformedVertices);
-                    if(collision) {
-                        rect.html.style.borderColor = "green";
-                        rects[i].html.style.borderColor = "green";
 
-                        rect.physics.position = rect.physics.position.sub(collision.normal.mult(collision.depth / 2));
-                        rects[i].physics.position = rects[i].physics.position.add(collision.normal.mult(collision.depth / 2));
+                for (let i = index + 1; i < rects.length; i++) {
+
+                    let collision = physics.Collisions.intersectPolygons(rect.physics.transformedVertices, rects[i].physics.transformedVertices);
+
+                    if(collision) {
+                        rect.collision = true;
+                        rects[i].collision = true;
+
+                        rect.physics.position = rect.physics.position.sub(collision.normal.mult(collision.depth * 0.25));
+                        rects[i].physics.position = rects[i].physics.position.add(collision.normal.mult(collision.depth * 0.25));
                         physics.Collisions.resolvePolygons(rect.physics, rects[i].physics, collision.normal, collision.depth);
                         let contact = physics.Collisions.findContactPoints(rect.physics.transformedVertices, rects[i].physics.transformedVertices);
+
                         if (contact.contactPoint1) {
-                            let p1 = createPointElement(contact.contactPoint1.x, contact.contactPoint1.y, 10, 'green');
-                            contactPoints.push(p1);
+                            let p1 = document.createElement('physics-point');
                             document.body.append(p1);
+                            p1.x = contact.contactPoint1.x;
+                            p1.y = contact.contactPoint1.y;
+                            contactPoints.push(p1);
                         }
+
                         if (contact.contactPoint2) {
-                            let p2 = createPointElement(contact.contactPoint2.x, contact.contactPoint2.y, 10, 'green');
+                            let p2 = document.createElement('physics-point');
                             contactPoints.push(p2);
+                            p2.x = contact.contactPoint2.x;
+                            p2.y = contact.contactPoint2.y;
                             document.body.append(p2);
                         }
-                    } else {
-                        rect.html.style.borderColor = "";
-                        rects[i].html.style.borderColor = "";
                     }
                 };
-
-                rect.html.style.left = rect.physics.position.x - rect.physics.width / 2 + 'px';
-                rect.html.style.top = rect.physics.position.y - rect.physics.height / 2 + 'px';
-                rect.html.style.transform = `rotate(${rect.physics.rotation}rad)`
             });
+
+            rects.forEach((rect) => {
+                rect.html.color = rect.collision ? "green" : "red";
+                rect.html.x = rect.physics.position.x;
+                rect.html.y = rect.physics.position.y;
+                rect.html.rotation = rect.physics.rotation;
+            })
         })
         
         key = new inputController();
         key.onChange(() => {
+
             rects[0].physics.acceleration = physics.Vector(
                 key.left && key.right ? 0 : key.left ? -1 : key.right ? 1 : 0,
                 key.up && key.down ? 0 : key.up ? -1 : key.down ? 1 : 0,
             ).normal.mult(0.5);
+
             rects[0].physics.rotationalVelocity = (key.rotateLeft && key.rotateRight ? 0 : key.rotateLeft ? -1 : key.rotateRight ? 1 : 0) / 360 * Math.PI * 2;
         });
        
         issetup = true;
-    }
-
-    function findElements() {
-        return [document.querySelector("h1")];
-    }
-
-    function cloneElements(elements) {
-        let clones = [];
-        elements.forEach(element => {
-            let clone = element.cloneNode(true);
-            document.body.append(clone);
-
-            element.style.visibility = "hidden";
-            clone.style.position = "absolute";
-            clone.style.zIndex = "2";
-
-            let elementBounds = element.getBoundingClientRect();
-            clone.style.left = `${elementBounds.x}px`;
-            clone.style.top = `${elementBounds.y}px`;
-            clone.style.width = `${elementBounds.width}px`;
-            clone.style.height = `${elementBounds.height}px`;
-
-            let elementParticle = physics.Particle(elementBounds.x, elementBounds.y);
-            elementParticle.velocity = physics.Vector();
-            elementParticle.acceleration = physics.Vector(0, 4);
-
-            physics.add(elementParticle);
-            physics.collide(elementParticle, physics.window);
-            physics.loop.onUpdate(() => {
-                clone.style.left = `${elementParticle.position.x}px`;
-                clone.style.top = `${elementParticle.position.y}px`;
-            })
-
-            clones.push(clone);
-        });
-        return clones;
     }
 })();

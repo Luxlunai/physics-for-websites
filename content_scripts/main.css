@@ -4,8 +4,8 @@
     border-radius: 50%;
 }
 
-.physics-body-rect {
+.rect {
     position: absolute;
     z-index: 1000;
-    border: 1px solid red;
+    box-sizing: border-box;
 }

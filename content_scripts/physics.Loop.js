@@ -6,6 +6,7 @@
         previousTime = 0.0;
         delta = 0.0;
         isRunning = false;
+        step = 0;
 
         callbacks = [];
 
@@ -14,8 +15,7 @@
          * @param {CallableFunction} callback callable function to loop
          * @param {number} speed number of times the function is called per second, default: 30
          */
-        constructor(callback, speed = 30) {
-            this.callbacks[0] = callback;
+        constructor(speed = 30) {
             this.timeStep = 1000.0 / speed;
         }
 
@@ -30,7 +30,8 @@
 
             // Call callback and reset delta
             if (this.delta > this.timeStep) {
-                this.callbacks.forEach((c) => c());
+                this.callbacks.forEach((c) => { if(!((this.step + c.skip) % c.skip)) c.fn() });
+                this.step++;
                 this.delta -= this.timeStep;
             }
 
@@ -65,8 +66,8 @@
             this.timeStep = 1000.0 / speed;
         }
 
-        onUpdate(callback) {
-            this.callbacks.push(callback);
+        onUpdate(callback, skipSteps = 1) {
+            this.callbacks.push({'fn': callback, 'skip': skipSteps});
         }
     }
 
