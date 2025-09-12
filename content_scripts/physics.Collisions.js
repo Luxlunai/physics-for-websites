@@ -149,12 +149,17 @@
 
         static resolvePolygons(body1, body2, normal, depth) {
             let relativeVelocity = body2.velocity.sub(body1.velocity);
+
+            if (relativeVelocity.dot(normal) > 0) return;
+
             let e = Math.min(body1.restitution, body2.restitution);
             let j = -(1 + e) * relativeVelocity.dot(normal);
-            j /= (1/body1.mass) + (1/body2.mass);
+            j /= body1.invMass + body2.invMass;
+            
+            let impulse = normal.mult(j); 
 
-            body1.velocity = body1.velocity.sub(normal.mult(j / body1.mass));
-            body2.velocity = body2.velocity.add(normal.mult(j / body2.mass));
+            body1.velocity = body1.velocity.sub(impulse.mult(body1.invMass));
+            body2.velocity = body2.velocity.add(impulse.mult(body2.invMass));
         }
 
         /**

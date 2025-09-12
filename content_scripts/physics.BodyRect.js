@@ -17,6 +17,7 @@
         rotationalVelocity = 0; //float
 
         mass = 0; //float
+        invMass = 0; //float
         area = 0; //float
 
         vertices = []; //physics.Vector[]
@@ -35,6 +36,7 @@
 
             this.area = this.width * this.height;
             this.mass = this.area * this.density;
+            this.invMass = !this.isStatic ? 1 / this.mass : 0;
 
             this.vertices = [
                 physics.Vector(-this.width / 2, -this.height / 2), //top-left

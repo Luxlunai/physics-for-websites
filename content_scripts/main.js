@@ -62,8 +62,8 @@
             });
 
             // rects[i].physics.rotation = Math.random() * Math.PI * 2;
-            rects[i].physics.restitution = 0.7;
-            rects[i].physics.acceleration = physics.Vector(0, 0.1);
+            rects[i].physics.restitution = 0.5;
+            rects[i].physics.acceleration = physics.Vector(0, 0.2);
             document.body.append(rects[i].html);
             rects[i].html.width = 50;
             rects[i].html.height = 50;
