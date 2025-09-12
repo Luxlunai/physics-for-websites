@@ -46,6 +46,7 @@
     }
 
     function setup() {
+
         let numberRects = 20;
         let widthRects = 50;
         let heightRects = 50;
@@ -68,14 +69,12 @@
             rects[i].html.height = 50;
         }
 
-        physics.loop.onUpdate(() => {   
+        physics.loop.onUpdate(() => {
+
             contactPoints.forEach((e) => {
                 e.remove();
             })
             contactPoints = [];
-        }, 5);
-
-        physics.loop.onUpdate(() => {
 
             rects.forEach((rect) => {
                 rect.physics.update();

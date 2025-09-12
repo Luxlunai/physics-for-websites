@@ -225,15 +225,15 @@
          * @returns {{contactPoint: PhysicsVector, distanceSquared: number}}
          */
         static pointSegmentDistance(p, a, b) {
-                let ab = b.sub(a);
-                let ap = p.sub(a);
-                let projection = ap.dot(ab);
-                let d = projection / ab.lengthSq;
-                let contactPoint = d <= 0 ? a : d >= 1 ? b : a.add(ab.mult(d));
-                return {
-                    "contactPoint": contactPoint,
-                    "distanceSquared": ap.distSq(contactPoint),
-                }
+            let ab = b.sub(a);
+            let ap = p.sub(a);
+            let projection = ap.dot(ab);
+            let d = projection / ab.lengthSq;
+            let contactPoint = d <= 0 ? a : d >= 1 ? b : a.add(ab.mult(d));
+            return {
+                "contactPoint": contactPoint,
+                "distanceSquared": p.distSq(contactPoint),
+            }
         }
     }
 
