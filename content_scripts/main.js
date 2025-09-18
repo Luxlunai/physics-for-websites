@@ -52,22 +52,16 @@
         let heightRects = 50;
         for (let i = 0; i < numberRects; i++) {
             let randomX = (0.1 + Math.random() * 0.8) * 1890;
-            let randomY = (0.1 + Math.random() * 0.8) * 1080;
-            rects.push({
-                width: widthRects,
-                height: heightRects,
-                physics: physics.BodyRect(physics.Vector(randomX, randomY), widthRects, heightRects),
-                html: document.createElement('physics-rect'),
-                collision: false
-            });
+            let randomY = (0.1 + Math.random() * 0.8) * (1080 / 2);
+            rects.push(physics.BodyRect(physics.Vector(randomX, randomY), widthRects, heightRects));
 
-            // rects[i].physics.rotation = Math.random() * Math.PI * 2;
-            rects[i].physics.restitution = 0.5;
-            rects[i].physics.acceleration = physics.Vector(0, 0.2);
-            document.body.append(rects[i].html);
-            rects[i].html.width = 50;
-            rects[i].html.height = 50;
+            // rects[i].rotation = Math.random() * Math.PI * 2;
+            rects[i].restitution = 0.5;
+            rects[i].acceleration = physics.Vector(0, 0.2);
         }
+
+        let floor = physics.BodyRect(physics.Vector(window.innerWidth / 2, window.innerHeight), window.innerWidth, 100, 1, 1, true);
+        rects.push(floor);
 
         physics.loop.onUpdate(() => {
 
@@ -77,36 +71,44 @@
             contactPoints = [];
 
             rects.forEach((rect) => {
-                rect.physics.update();
-                rect.collision = false;
+                rect.update();
+                rect.color = "grey";
             });
 
             rects.forEach((rect, index) => {
-                let windowCollision = physics.Collisions.intersectWindow(rect.physics.transformedVertices);
+                // let windowCollision = physics.Collisions.intersectWindow(rect.transformedVertices);
 
-                if (windowCollision) {
-                    rect.physics.position = rect.physics.position.sub(windowCollision.normal.mult(windowCollision.depth));
-                    physics.Collisions.resolveWindow(rect.physics, windowCollision.normal);
-                }
+                // if (windowCollision) {
+                //     rect.position = rect.position.sub(windowCollision.normal.mult(windowCollision.depth));
+                //     physics.Collisions.resolveWindow(rect, windowCollision.normal);
+                // }
 
                 for (let i = index + 1; i < rects.length; i++) {
 
-                    let collision = physics.Collisions.intersectPolygons(rect.physics.transformedVertices, rects[i].physics.transformedVertices);
+                    let collision = physics.Collisions.intersectPolygons(rect.transformedVertices, rects[i].transformedVertices);
 
                     if(collision) {
-                        rect.collision = true;
-                        rects[i].collision = true;
+                        if (!rect.isStatic) rect.color = "green";
+                        if (!rects[i].isStatic) rects[i].color = "green";
 
-                        rect.physics.position = rect.physics.position.sub(collision.normal.mult(collision.depth * 0.25));
-                        rects[i].physics.position = rects[i].physics.position.add(collision.normal.mult(collision.depth * 0.25));
-                        physics.Collisions.resolvePolygons(rect.physics, rects[i].physics, collision.normal, collision.depth);
-                        let contact = physics.Collisions.findContactPoints(rect.physics.transformedVertices, rects[i].physics.transformedVertices);
+                        if (rect.isStatic) {
+                            rects[i].position = rects[i].position.add(collision.normal.mult(collision.depth));
+                        } else if (rects[i].isStatic) {
+                            rect.position = rect.position.sub(collision.normal.mult(collision.depth));
+                        } else {
+                            rect.position = rect.position.sub(collision.normal.mult(collision.depth / 2));
+                            rects[i].position = rects[i].position.add(collision.normal.mult(collision.depth / 2));
+                        }
+
+                        physics.Collisions.resolvePolygons(rect, rects[i], collision.normal, collision.depth);
+                        let contact = physics.Collisions.findContactPoints(rect.transformedVertices, rects[i].transformedVertices);
 
                         if (contact.contactPoint1) {
                             let p1 = document.createElement('physics-point');
                             document.body.append(p1);
                             p1.x = contact.contactPoint1.x;
                             p1.y = contact.contactPoint1.y;
+                            p1.color = "orange";
                             contactPoints.push(p1);
                         }
 
@@ -115,29 +117,23 @@
                             contactPoints.push(p2);
                             p2.x = contact.contactPoint2.x;
                             p2.y = contact.contactPoint2.y;
+                            p2.color = "orange";
                             document.body.append(p2);
                         }
                     }
                 };
             });
-
-            rects.forEach((rect) => {
-                rect.html.color = rect.collision ? "green" : "red";
-                rect.html.x = rect.physics.position.x;
-                rect.html.y = rect.physics.position.y;
-                rect.html.rotation = rect.physics.rotation;
-            })
         })
         
         key = new inputController();
         key.onChange(() => {
 
-            rects[0].physics.acceleration = physics.Vector(
+            rects[0].acceleration = physics.Vector(
                 key.left && key.right ? 0 : key.left ? -1 : key.right ? 1 : 0,
                 key.up && key.down ? 0 : key.up ? -1 : key.down ? 1 : 0,
             ).normal.mult(0.5);
 
-            rects[0].physics.rotationalVelocity = (key.rotateLeft && key.rotateRight ? 0 : key.rotateLeft ? -1 : key.rotateRight ? 1 : 0) / 360 * Math.PI * 2;
+            rects[0].rotationalVelocity = (key.rotateLeft && key.rotateRight ? 0 : key.rotateLeft ? -1 : key.rotateRight ? 1 : 0) / 360 * Math.PI * 2;
         });
        
         issetup = true;

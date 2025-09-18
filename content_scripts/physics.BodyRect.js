@@ -25,6 +25,10 @@
 
         transformUpdateRequired = false; //bool
 
+        color = "grey";
+        borderColor = "white";
+        html = null;
+
         constructor(position, width, height, density = 1, restitution = 1, isStatic = false) {
             this.position = position;
             this.width = width;
@@ -45,6 +49,16 @@
                 physics.Vector(-this.width / 2, this.height / 2), //bottom-left
             ]
             this.transformUpdateRequired = true;
+
+            this.html = document.createElement('physics-rect');
+            document.body.append(this.html);
+            this.html.x = this.position.x;
+            this.html.y = this.position.y;
+            this.html.width = this.width;
+            this.html.height = this.height;
+            this.html.rotation = this.rotation;
+            this.html.color = this.color;
+            this.html.borderColor = this.borderColor;
         }
 
         update() {
@@ -52,6 +66,14 @@
             this.position = this.position.add(this.velocity);
             this.rotation += this.rotationalVelocity;
             this.transformUpdateRequired = true;
+
+            this.html.x = this.position.x;
+            this.html.y = this.position.y;
+            this.html.width = this.width;
+            this.html.height = this.height;
+            this.html.rotation = this.rotation;
+            this.html.color = this.color;
+            this.html.borderColor = this.borderColor;
         }
 
         get transformedVertices() {
