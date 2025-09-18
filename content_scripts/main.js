@@ -53,10 +53,8 @@
         for (let i = 0; i < numberRects; i++) {
             let randomX = (0.1 + Math.random() * 0.8) * 1890;
             let randomY = (0.1 + Math.random() * 0.8) * (1080 / 2);
-            rects.push(physics.BodyRect(physics.Vector(randomX, randomY), widthRects, heightRects));
+            rects.push(physics.BodyRect(physics.Vector(randomX, randomY), widthRects, heightRects, 10, 0.3));
 
-            // rects[i].rotation = Math.random() * Math.PI * 2;
-            rects[i].restitution = 0.5;
             rects[i].acceleration = physics.Vector(0, 0.2);
         }
 
@@ -100,26 +98,34 @@
                             rects[i].position = rects[i].position.add(collision.normal.mult(collision.depth / 2));
                         }
 
-                        physics.Collisions.resolvePolygons(rect, rects[i], collision.normal, collision.depth);
+                        // physics.Collisions.resolvePolygons(rect, rects[i], collision.normal, collision.depth);
                         let contact = physics.Collisions.findContactPoints(rect.transformedVertices, rects[i].transformedVertices);
 
-                        if (contact.contactPoint1) {
-                            let p1 = document.createElement('physics-point');
-                            document.body.append(p1);
-                            p1.x = contact.contactPoint1.x;
-                            p1.y = contact.contactPoint1.y;
-                            p1.color = "orange";
-                            contactPoints.push(p1);
-                        }
+                        physics.Collisions.resolvePolygonsWithRotation(
+                            rect, 
+                            rects[i], 
+                            collision.normal, 
+                            contact.contactPoint1, 
+                            contact.contactPoint2, 
+                            contact.contactCount
+                        )
+                        // if (contact.contactPoint1) {
+                        //     let p1 = document.createElement('physics-point');
+                        //     document.body.append(p1);
+                        //     p1.x = contact.contactPoint1.x;
+                        //     p1.y = contact.contactPoint1.y;
+                        //     p1.color = "orange";
+                        //     contactPoints.push(p1);
+                        // }
 
-                        if (contact.contactPoint2) {
-                            let p2 = document.createElement('physics-point');
-                            contactPoints.push(p2);
-                            p2.x = contact.contactPoint2.x;
-                            p2.y = contact.contactPoint2.y;
-                            p2.color = "orange";
-                            document.body.append(p2);
-                        }
+                        // if (contact.contactPoint2) {
+                        //     let p2 = document.createElement('physics-point');
+                        //     contactPoints.push(p2);
+                        //     p2.x = contact.contactPoint2.x;
+                        //     p2.y = contact.contactPoint2.y;
+                        //     p2.color = "orange";
+                        //     document.body.append(p2);
+                        // }
                     }
                 };
             });

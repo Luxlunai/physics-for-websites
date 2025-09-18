@@ -15,10 +15,13 @@
         acceleration = physics.Vector(); //physics.Vector
         rotation = 0; //float
         rotationalVelocity = 0; //float
+        angularVelocity = 0; //float
 
         mass = 0; //float
         invMass = 0; //float
         area = 0; //float
+        inertia = 0; //float
+        invInertia = 0; //float
 
         vertices = []; //physics.Vector[]
         _transformedVertices = []; //physics.Vector[]
@@ -42,6 +45,9 @@
             this.mass = this.area * this.density;
             this.invMass = !this.isStatic ? 1 / this.mass : 0;
 
+            this.inertia = this.calculateRotationalInertia();
+            this.invInertia = !this.isStatic ? 1 / this.inertia : 0;
+
             this.vertices = [
                 physics.Vector(-this.width / 2, -this.height / 2), //top-left
                 physics.Vector(this.width / 2, -this.height / 2), //top-right
@@ -64,7 +70,7 @@
         update() {
             this.velocity = this.velocity.add(this.acceleration);
             this.position = this.position.add(this.velocity);
-            this.rotation += this.rotationalVelocity;
+            this.rotation += this.angularVelocity;
             this.transformUpdateRequired = true;
 
             this.html.x = this.position.x;
@@ -76,10 +82,14 @@
             this.html.borderColor = this.borderColor;
         }
 
+        calculateRotationalInertia() {
+            return (1 / 12) * this.mass * (this.width ** 2 + this.height ** 2);
+        }
+
         get transformedVertices() {
             if(this.transformUpdateRequired) {
                 this.vertices.forEach((v, i) => {
-                    this._transformedVertices[i] = v.transform(this.position, this.rotation)
+                    this._transformedVertices[i] = v.transform(this.position, this.rotation);
                 })
                 this.transformUpdateRequired = false;
             }

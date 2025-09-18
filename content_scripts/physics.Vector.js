@@ -84,6 +84,15 @@
             return this.x * vector.x + this.y * vector.y; 
         }
 
+        cross(vector) {
+            // return new PhysicsVector(
+            //     this.y * vector.z - this.z * vector.y,
+            //     this.z * vector.x - this.x * vector.z,
+            //     this.x * vector.y - this.y * vector.x
+            // )
+            return  this.x * vector.y - this.y * vector.x;
+        }
+
         approxeq(vector) {
             return physics.approxeq(this.x, vector.x) && physics.approxeq(this.y, vector.y)
         }

@@ -162,6 +162,65 @@
             body2.velocity = body2.velocity.add(impulse.mult(body2.invMass));
         }
 
+        static resolvePolygonsWithRotation(body1, body2, normal, contactPoint1, contactPoint2, contactCount) {
+            let contactList = [contactPoint1, contactPoint2];
+            let impulseList = [];
+            let r1List = [];
+            let r2List = [];
+
+            for (let i = 0; i < contactCount; i++) {
+                let r1 = contactList[i].sub(body1.position);
+                let r2 = contactList[i].sub(body2.position);
+
+                r1List[i] = r1;
+                r2List[i] = r2;
+
+                let r1Perp = physics.Vector(-r1.y, r1.x);
+                let r2Perp = physics.Vector(-r2.y, r2.x);
+
+                let angularVelocity1 = r1Perp.mult(body1.angularVelocity);
+                let angularVelocity2 = r2Perp.mult(body2.angularVelocity);
+
+                let relativeVelocity = (body2.velocity.add(angularVelocity2)).sub(body1.velocity.add(angularVelocity1));
+
+                let contactVelocityMag = relativeVelocity.dot(normal);
+
+                if (contactVelocityMag > 0) {
+                    continue;
+                }
+
+                let r1PerpDotN = r1Perp.dot(normal);
+                let r2PerpDotN = r2Perp.dot(normal);
+
+                let denominator = 
+                    body1.invMass + body2.invMass + 
+                    (r1PerpDotN ** 2 * body1.invInertia) + 
+                    (r2PerpDotN ** 2 * body2.invInertia);
+                
+                let e = Math.min(body1.restitution, body2.restitution);
+
+                let j = -(1 + e) * contactVelocityMag;
+                j /= denominator;
+                j /= contactCount;
+
+                let impulse = normal.mult(j); 
+                impulseList[i] = impulse; 
+            }
+
+            for (let i = 0; i < contactCount; i++) {
+                let impulse = impulseList[i];
+                if (!impulse) continue;
+                let r1 = r1List[i];
+                let r2 = r2List[i];
+
+                console.log(impulseList);
+                body1.velocity = body1.velocity.add(impulse.negative.mult(body1.invMass));
+                body1.angularVelocity += -r1.cross(impulse) * body1.invInertia;
+                body2.velocity = body2.velocity.add(impulse.mult(body2.invMass));
+                body2.angularVelocity += r2.cross(impulse) * body2.invInertia;
+            }
+        }
+
         /**
          * 
          * @param {[PhysicsVector]} vertices1 
