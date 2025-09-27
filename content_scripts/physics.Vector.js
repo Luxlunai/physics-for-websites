@@ -77,7 +77,7 @@
         }
 
         div(vector) {
-            return this.add(physics.isVector(vector) ? vector.percentile : 1 / vector);
+            return this.mult(physics.isVector(vector) ? vector.percentile : 1 / vector);
         }
 
         dot(vector) {

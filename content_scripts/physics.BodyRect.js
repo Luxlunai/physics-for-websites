@@ -23,10 +23,11 @@
         inertia = 0; //float
         invInertia = 0; //float
 
-        vertices = []; //physics.Vector[]
-        _transformedVertices = []; //physics.Vector[]
+        staticFriction = 0.6;
+        dynamicFriction = 0.4;
 
-        transformUpdateRequired = false; //bool
+        vertices = []; //physics.Vector[]
+        transformedVertices = []; //physics.Vector[]
 
         color = "grey";
         borderColor = "white";
@@ -45,7 +46,7 @@
             this.mass = this.area * this.density;
             this.invMass = !this.isStatic ? 1 / this.mass : 0;
 
-            this.inertia = this.calculateRotationalInertia();
+            this.inertia = (1 / 12) * this.mass * (this.height ** 2 + this.width ** 2);
             this.invInertia = !this.isStatic ? 1 / this.inertia : 0;
 
             this.vertices = [
@@ -54,10 +55,10 @@
                 physics.Vector(this.width / 2, this.height / 2), //bottom-right
                 physics.Vector(-this.width / 2, this.height / 2), //bottom-left
             ]
-            this.transformUpdateRequired = true;
 
             this.html = document.createElement('physics-rect');
             document.body.append(this.html);
+
             this.html.x = this.position.x;
             this.html.y = this.position.y;
             this.html.width = this.width;
@@ -72,6 +73,11 @@
             this.position = this.position.add(this.velocity);
             this.rotation += this.angularVelocity;
             this.transformUpdateRequired = true;
+            // if (!this.isStatic) console.log(this.angularVelocity);
+
+            this.vertices.forEach((v, i) => {
+                this.transformedVertices[i] = v.transform(this.position, this.rotation);
+            })
 
             this.html.x = this.position.x;
             this.html.y = this.position.y;
@@ -80,20 +86,6 @@
             this.html.rotation = this.rotation;
             this.html.color = this.color;
             this.html.borderColor = this.borderColor;
-        }
-
-        calculateRotationalInertia() {
-            return (1 / 12) * this.mass * (this.width ** 2 + this.height ** 2);
-        }
-
-        get transformedVertices() {
-            if(this.transformUpdateRequired) {
-                this.vertices.forEach((v, i) => {
-                    this._transformedVertices[i] = v.transform(this.position, this.rotation);
-                })
-                this.transformUpdateRequired = false;
-            }
-            return this._transformedVertices;
         }
     }
 
