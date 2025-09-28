@@ -4,19 +4,19 @@
     class HTMLRectElement extends HTMLCustomElement {
 
         static get observedAttributes() {
-            return ['x', 'y', 'width', 'height', 'rotation', 'color', 'borderColor'];
+            return ["x", "y", "width", "height", "rotation", "color", "borderColor"];
         }
 
         static get defaultValues() {
-            return {'x': 0, 'y': 0, 'width': 100, 'height': 100, 'rotation': 0, 'color': 'red', 'borderColor': 'white'}
+            return {"x": 0, "y": 0, "width": 100, "height": 100, "rotation": 0, "color": "red", "borderColor": "white"}
         }
 
         constructor() {
             super(HTMLRectElement);
 
-            const shadow = this.attachShadow({ mode: 'open' });
-            const rect = document.createElement('div');
-            const style = document.createElement('style');
+            const shadow = this.attachShadow({ mode: "open" });
+            const rect = document.createElement("div");
+            const style = document.createElement("style");
             shadow.append(rect);
             shadow.append(style);
 
@@ -43,5 +43,5 @@
         }
     };
 
-    customElements.define('physics-rect', HTMLRectElement);
+    customElements.define("physics-rect", HTMLRectElement);
 })();

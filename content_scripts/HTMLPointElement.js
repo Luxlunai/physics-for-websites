@@ -4,19 +4,19 @@
     class HTMLPointElement extends HTMLCustomElement {
         
         static get observedAttributes() {
-            return ['x', 'y', 'radius', 'color'];
+            return ["x", "y", "radius", "color"];
         }
 
         static get defaultValues() {
-            return {'x': 0, 'y': 0, 'radius': 8, 'color': 'green'}
+            return {"x": 0, "y": 0, "radius": 8, "color": "green"}
         }
 
         constructor() {
             super(HTMLPointElement);
 
-            const shadow = this.attachShadow({ mode: 'open' });
-            const point = document.createElement('div');
-            const style = document.createElement('style');
+            const shadow = this.attachShadow({ mode: "open" });
+            const point = document.createElement("div");
+            const style = document.createElement("style");
             shadow.append(point);
             shadow.append(style);
             
@@ -41,5 +41,5 @@
         }
     }
 
-    customElements.define('physics-point', HTMLPointElement);
+    customElements.define("physics-point", HTMLPointElement);
 })();
