@@ -42,6 +42,7 @@
         constructor(position, width, height, density = 1, restitution = 1, isStatic = false, node = null) {
 
             this.node = node ? node.cloneNode(true) : document.createElement("div");
+            this.node.classList.add("physics-body");
             this.node.style.position = "absolute";
             this.node.style.boxSizing = "border-box";
             this.node.style.zIndex = 1000;
@@ -50,6 +51,7 @@
 
             if (this.debug) {
                 this.debugNode = document.createElement("physics-rect");
+                this.debugNode.classList.add("physics-body");
                 document.body.append(this.debugNode);
             }
 

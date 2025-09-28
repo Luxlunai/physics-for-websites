@@ -41,5 +41,6 @@
         }
     }
 
+    if (customElements.get("physics-point")) return;
     customElements.define("physics-point", HTMLPointElement);
 })();

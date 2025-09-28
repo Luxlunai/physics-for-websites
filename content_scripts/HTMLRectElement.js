@@ -43,5 +43,6 @@
         }
     };
 
+    if (customElements.get("physics-rect")) return;
     customElements.define("physics-rect", HTMLRectElement);
 })();
