@@ -14,7 +14,6 @@
     });
 
     let issetup, elements, clones;
-    let windowBorders = [];
     let rects = [];
     let contactPoints = [];
     let updatesPerSecond = 300;
@@ -35,32 +34,57 @@
     function resetPage() {
         physics.loop.reset();
         
+        clones.forEach((clone) => {
+            clone.style.opacity = 1;
+        })
         rects.forEach((rect) => {
-            rect.html.remove();
+            rect.node.remove();
+            if (rect.debugNode) rect.debugNode.remove();
         });
         rects = [];
-        contactPoints.forEach((e) => {
-            e.remove();
-        })
-        contactPoints = [];
         issetup = false;
     }
 
     function setup() {
 
-        let numberRects = 10;
-        let widthRects = 50;
-        let heightRects = 70;
-        for (let i = 0; i < numberRects; i++) {
-            let randomX = (0.1 + Math.random() * 0.8) * 1890;
-            let randomY = (0.1 + Math.random() * 0.8) * (1080 / 2);
-            rects.push(physics.BodyRect(physics.Vector(randomX, randomY), widthRects, heightRects, 0.2, 0.3));
+        let wallThickness = 100;
+        rects = [
+            physics.BodyRect(physics.Vector(window.innerWidth / 2, window.innerHeight + wallThickness / 2), window.innerWidth, wallThickness, 1, 1, true),
+            physics.BodyRect(physics.Vector(window.innerWidth / 2, 0 - wallThickness / 2), window.innerWidth, wallThickness, 1, 1, true),
+            physics.BodyRect(physics.Vector(0 - wallThickness / 2, window.innerHeight / 2), 100, window.innerHeight, wallThickness, 1, 1, true),
+            physics.BodyRect(physics.Vector(window.innerWidth + wallThickness / 2, window.innerHeight / 2), 100, window.innerHeight, wallThickness, 1, 1, true)
+        ]
 
-            rects[i].acceleration = physics.Vector(0, 0);
-        }
+        elements = document.querySelectorAll("body *");
+        clones = [];
+        for (let element of elements) {
+            let skip = false;
 
-        let floor = physics.BodyRect(physics.Vector(window.innerWidth / 2, window.innerHeight), window.innerWidth, 100, 1, 1, true);
-        rects.push(floor);
+            for (let clone of clones) {
+                if (clone.contains(element)) {
+                    skip = true;
+                }
+            }
+            if (skip) continue;
+
+            let bBox = element.getBoundingClientRect();
+            if (
+                element.checkVisibility()
+                && bBox.width < window.outerWidth / 5 
+                && bBox.height < window.outerHeight / 5
+                && bBox.width > 10
+                && bBox.height > 10
+                && bBox.x > 0
+                && bBox.y > 0
+                && bBox.x < window.innerWidth
+                && bBox.y < window.innerHeight
+            ) {
+                clones.push(element);
+                rects.push(physics.BodyNode(element, 0.2, 0.3));
+                element.style.opacity = 0;
+            }
+            if (clones.length > 20) break;
+        };
 
         physics.loop.onUpdate(() => {
 
@@ -70,8 +94,11 @@
             contactPoints = [];
 
             rects.forEach((rect) => {
+                if (rect.position.y > window.innerHeight * 1.5) {
+                    rect.position = physics.Vector(window.innerWidth / 2, window.innerHeight / 2);
+                    rect.velocity = physics.Vector();
+                }
                 rect.update(updatesPerSecond, physics.Vector(0, 9.81 * 100));
-                rect.color = "grey";
             });
 
             rects.forEach((rect, index) => {
@@ -83,8 +110,6 @@
                     let collision = physics.Collisions.intersectPolygons(rect.transformedVertices, rects[i].transformedVertices);
 
                     if(collision) {
-                        if (!rect.isStatic) rect.color = "green";
-                        if (!rects[i].isStatic) rects[i].color = "green";
 
                         if (rect.isStatic) {
                             rects[i].position = rects[i].position.add(collision.normal.mult(collision.depth));
@@ -105,23 +130,6 @@
                             contact.contactPoint2, 
                             contact.contactCount
                         )
-
-                        if (contact.contactPoint1) {
-                            let p1 = document.createElement('physics-point');
-                            document.body.append(p1);
-                            p1.x = contact.contactPoint1.x;
-                            p1.y = contact.contactPoint1.y;
-                            p1.color = "orange";
-                            contactPoints.push(p1);
-                        }
-                        if (contact.contactPoint2) {
-                            let p2 = document.createElement('physics-point');
-                            contactPoints.push(p2);
-                            p2.x = contact.contactPoint2.x;
-                            p2.y = contact.contactPoint2.y;
-                            p2.color = "orange";
-                            document.body.append(p2);
-                        }
                     }
                 };
             });

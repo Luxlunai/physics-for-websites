@@ -32,14 +32,32 @@
             min: physics.Vector(0, 0)
         }
 
-        color = "grey";
-        borderColor = "white";
-        html = null;
+        color = "transparent";
+        borderColor = "grey";
+        node = null;
 
-        constructor(position, width, height, density = 1, restitution = 1, isStatic = false) {
-            this.position = position;
-            this.width = width;
-            this.height = height;
+        debug = false;
+        debugNode = null;
+
+        constructor(position, width, height, density = 1, restitution = 1, isStatic = false, node = null) {
+
+            this.node = node ? node.cloneNode(true) : document.createElement("div");
+            this.node.style.position = "absolute";
+            this.node.style.boxSizing = "border-box";
+            this.node.style.zIndex = 1000;
+            this.node.style.margin = 0;
+            document.body.append(this.node);
+
+            if (this.debug) {
+                this.debugNode = document.createElement("physics-rect");
+                document.body.append(this.debugNode);
+            }
+
+            let bBox = node ? node.getBoundingClientRect() : false;
+
+            this.position = bBox ? physics.Vector(bBox.x + bBox.width / 2, bBox.y + bBox.height / 2) : position;
+            this.width = bBox ? bBox.width : width;
+            this.height = bBox ? bBox.height : height;
             this.density = density;
             this.restitution = restitution;
 
@@ -61,30 +79,16 @@
             this.vertices.forEach((v, i) => {
                 this.transformedVertices[i] = v.transform(this.position, this.rotation);
             })
-            this.calcBBox();
+            this.bBox = this.calcBBox();
 
-            this.html = document.createElement('physics-rect');
-            document.body.append(this.html);
-
-            this.html.x = this.position.x;
-            this.html.y = this.position.y;
-            this.html.width = this.width;
-            this.html.height = this.height;
-            this.html.rotation = this.rotation;
-            this.html.color = this.color;
-            this.html.borderColor = this.borderColor;
+            this.updateNode();
         }
 
         update(updatesPerSecond = 30, gravity = physics.Vector(0, 9.81)) {
             if (this.isStatic) return;
-
-            this.html.x = this.position.x;
-            this.html.y = this.position.y;
-            this.html.width = this.width;
-            this.html.height = this.height;
-            this.html.rotation = this.rotation;
-            this.html.color = this.color;
-            this.html.borderColor = this.borderColor;
+            
+            this.updateNode();
+            // console.log(this.position.y - this.height / 2 + "px", this.bBox.min.y, this.node.getBoundingClientRect().y);
 
             this.velocity = this.velocity.add(gravity.div(updatesPerSecond).add(this.acceleration.div(updatesPerSecond)));
             this.position = this.position.add(this.velocity.div(updatesPerSecond));
@@ -104,24 +108,48 @@
             this.vertices.forEach((v, i) => {
                 this.transformedVertices[i] = v.transform(this.position, this.rotation);
             })
-            this.calcBBox();
+            this.bBox = this.calcBBox();
+        }
+
+        updateNode() {
+            this.node.style.left = this.position.x - this.width / 2 + "px";
+            this.node.style.top = this.position.y - this.height / 2 + "px";
+            this.node.style.width = this.width + "px";
+            this.node.style.height = this.height + "px";
+            this.node.style.transform = `rotate(${this.rotation}rad)`;
+            this.node.style.backgroundColor = this.color;
+            this.node.style.border = `1px solid ${this.borderColor}`;
+
+            if (this.debug) {
+                this.debugNode.x = this.position.x;
+                this.debugNode.y = this.position.y;
+                this.debugNode.width = this.width;
+                this.debugNode.height = this.height;
+                this.debugNode.rotation = this.rotation;
+                this.debugNode.color = "transparent";
+                this.debugNode.borderColor = "red";
+            }
         }
 
         calcBBox() {
-            this.bBox = {
+            let bBox = {
                 max: physics.Vector(-Infinity, -Infinity), 
                 min: physics.Vector(Infinity, Infinity)
             }
             this.transformedVertices.forEach((v) => {
-                this.bBox.max.x = v.x > this.bBox.max.x ? v.x : this.bBox.max.x;
-                this.bBox.max.y = v.y > this.bBox.max.y ? v.y : this.bBox.max.y;
-                this.bBox.min.x = v.x < this.bBox.min.x ? v.x : this.bBox.min.x;
-                this.bBox.min.y = v.y < this.bBox.min.y ? v.y : this.bBox.min.y;
+                bBox.max.x = v.x > bBox.max.x ? v.x : bBox.max.x;
+                bBox.max.y = v.y > bBox.max.y ? v.y : bBox.max.y;
+                bBox.min.x = v.x < bBox.min.x ? v.x : bBox.min.x;
+                bBox.min.y = v.y < bBox.min.y ? v.y : bBox.min.y;
             })
+            return bBox;
         }
     }
 
     window.physics.BodyRect = (position, width, height, density, restitution, isStatic) => { 
         return new PhysicsBodyRect(position, width, height, density, restitution, isStatic ); 
+    };
+    window.physics.BodyNode = (node, density, restitution, isStatic) => {
+        return new PhysicsBodyRect(physics.Vector(), 0, 0, density, restitution, isStatic, node); 
     };
 })();
