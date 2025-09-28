@@ -22,11 +22,15 @@
         inertia = 0; //float
         invInertia = 0; //float
 
-        staticFriction = 1;
+        staticFriction = 0.6;
         dynamicFriction = 0.4;
 
         vertices = []; //physics.Vector[]
         transformedVertices = []; //physics.Vector[]
+        bBox = {
+            max: physics.Vector(0, 0), 
+            min: physics.Vector(0, 0)
+        }
 
         color = "grey";
         borderColor = "white";
@@ -35,7 +39,7 @@
         constructor(position, width, height, density = 1, restitution = 1, isStatic = false) {
             this.position = position;
             this.width = width;
-            this.height = height
+            this.height = height;
             this.density = density;
             this.restitution = restitution;
 
@@ -57,6 +61,7 @@
             this.vertices.forEach((v, i) => {
                 this.transformedVertices[i] = v.transform(this.position, this.rotation);
             })
+            this.calcBBox();
 
             this.html = document.createElement('physics-rect');
             document.body.append(this.html);
@@ -83,12 +88,36 @@
 
             this.velocity = this.velocity.add(gravity.div(updatesPerSecond).add(this.acceleration.div(updatesPerSecond)));
             this.position = this.position.add(this.velocity.div(updatesPerSecond));
-            this.rotation += this.rotationalVelocity / updatesPerSecond;
+
+            // if the rotation is close to a multiple of PI/2 and the rotational velocity is almost 0,
+            // set the rotation to the closest multiple of PI/2 and the rotationl velocity to 0
+            if (
+                physics.approxeq(this.rotationalVelocity / updatesPerSecond, 0, 0.001) 
+                    && physics.approxeq(this.rotation % (Math.PI / 2), 0)
+                ) {
+                this.rotation = Math.PI / 2 * Math.round(this.rotation / (Math.PI / 2));
+                this.rotationalVelocity = 0;
+            } else {
+                this.rotation += this.rotationalVelocity / updatesPerSecond;
+            }
 
             this.vertices.forEach((v, i) => {
                 this.transformedVertices[i] = v.transform(this.position, this.rotation);
             })
-            // console.log(this.transformedVertices[0].y);
+            this.calcBBox();
+        }
+
+        calcBBox() {
+            this.bBox = {
+                max: physics.Vector(-Infinity, -Infinity), 
+                min: physics.Vector(Infinity, Infinity)
+            }
+            this.transformedVertices.forEach((v) => {
+                this.bBox.max.x = v.x > this.bBox.max.x ? v.x : this.bBox.max.x;
+                this.bBox.max.y = v.y > this.bBox.max.y ? v.y : this.bBox.max.y;
+                this.bBox.min.x = v.x < this.bBox.min.x ? v.x : this.bBox.min.x;
+                this.bBox.min.y = v.y < this.bBox.min.y ? v.y : this.bBox.min.y;
+            })
         }
     }
 

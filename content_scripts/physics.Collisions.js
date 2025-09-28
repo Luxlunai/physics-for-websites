@@ -4,42 +4,8 @@
     class PhysicsCollisions {
         constructor() {}
 
-        static intersectWindow(vertices) {
-            let normal;
-            let depth = Infinity;
-
-            for (let i = 0; i < vertices.length; i++) {
-                if(vertices[i].x < 0) {
-                    return {
-                        "depth": 0 - vertices[i].x,
-                        "normal": physics.Vector(-1, 0)
-                    };
-                } else if (vertices[i].x > window.innerWidth) {
-                    return {
-                        "depth": vertices[i].x - window.innerWidth,
-                        "normal": physics.Vector(1, 0) 
-                    };
-                } else if (vertices[i].y < 0) {
-                    return { 
-                        "depth": 0 - vertices[i].y,
-                        "normal": physics.Vector(0, -1) 
-                    };
-                } else if (vertices[i].y > window.innerHeight){
-                    return {
-                        "depth": vertices[i].y - window.innerHeight,
-                        "normal": physics.Vector(0, 1) 
-                    };
-                }
-            }
-            return false;
-        }
-
-        static resolveWindow(body, normal) {
-            let e = body.restitution;
-            let j = -(1 + e) * body.velocity.negative.dot(normal);
-            j /= (1 / body.mass);
-
-            body.velocity = body.velocity.sub(normal.mult(j / body.mass));
+        static intersectAABBs(a, b) {
+            return a.max.x <= b.min.x || b.max.x <= a.min.x || a.max.y >= b.min.y || b.max.y >= a.min.y;
         }
 
         /**

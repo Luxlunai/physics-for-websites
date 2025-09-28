@@ -17,8 +17,7 @@
     let windowBorders = [];
     let rects = [];
     let contactPoints = [];
-    let updatesPerSecond = 30;
-    let precision = 10;
+    let updatesPerSecond = 300;
 
 
     function enablePhysics() {
@@ -49,13 +48,13 @@
 
     function setup() {
 
-        let numberRects = 1;
+        let numberRects = 10;
         let widthRects = 50;
         let heightRects = 70;
         for (let i = 0; i < numberRects; i++) {
             let randomX = (0.1 + Math.random() * 0.8) * 1890;
             let randomY = (0.1 + Math.random() * 0.8) * (1080 / 2);
-            rects.push(physics.BodyRect(physics.Vector(randomX, randomY), widthRects, heightRects, 0.5, 0.3));
+            rects.push(physics.BodyRect(physics.Vector(randomX, randomY), widthRects, heightRects, 0.2, 0.3));
 
             rects[i].acceleration = physics.Vector(0, 0);
         }
@@ -65,69 +64,67 @@
 
         physics.loop.onUpdate(() => {
 
-            let iterations = precision;
-            for (let i = 0; i < iterations; i++) {
+            contactPoints.forEach((e) => {
+                e.remove();
+            })
+            contactPoints = [];
 
-                contactPoints.forEach((e) => {
-                    e.remove();
-                })
-                contactPoints = [];
+            rects.forEach((rect) => {
+                rect.update(updatesPerSecond, physics.Vector(0, 9.81 * 100));
+                rect.color = "grey";
+            });
 
-                rects.forEach((rect) => {
-                    rect.update(updatesPerSecond * iterations, physics.Vector(0, 100));
-                    rect.color = "grey";
-                });
+            rects.forEach((rect, index) => {
 
-                rects.forEach((rect, index) => {
+                for (let i = index + 1; i < rects.length; i++) {
 
-                    for (let i = index + 1; i < rects.length; i++) {
+                    if (!physics.Collisions.intersectAABBs(rect.bBox, rects[i].bBox)) continue;
 
-                        let collision = physics.Collisions.intersectPolygons(rect.transformedVertices, rects[i].transformedVertices);
+                    let collision = physics.Collisions.intersectPolygons(rect.transformedVertices, rects[i].transformedVertices);
 
-                        if(collision) {
-                            if (!rect.isStatic) rect.color = "green";
-                            if (!rects[i].isStatic) rects[i].color = "green";
+                    if(collision) {
+                        if (!rect.isStatic) rect.color = "green";
+                        if (!rects[i].isStatic) rects[i].color = "green";
 
-                            if (rect.isStatic) {
-                                rects[i].position = rects[i].position.add(collision.normal.mult(collision.depth));
-                            } else if (rects[i].isStatic) {
-                                rect.position = rect.position.sub(collision.normal.mult(collision.depth));
-                            } else {
-                                rect.position = rect.position.sub(collision.normal.mult(collision.depth / 2));
-                                rects[i].position = rects[i].position.add(collision.normal.mult(collision.depth / 2));
-                            }
-
-                            let contact = physics.Collisions.findContactPoints(rect.transformedVertices, rects[i].transformedVertices);
-                            physics.Collisions.resolvePolygonsWithRotation(
-                                rect, 
-                                rects[i], 
-                                collision.normal,
-                                collision.depth, 
-                                contact.contactPoint1, 
-                                contact.contactPoint2, 
-                                contact.contactCount
-                            )
-
-                            if (contact.contactPoint1) {
-                                let p1 = document.createElement('physics-point');
-                                document.body.append(p1);
-                                p1.x = contact.contactPoint1.x;
-                                p1.y = contact.contactPoint1.y;
-                                p1.color = "orange";
-                                contactPoints.push(p1);
-                            }
-                            if (contact.contactPoint2) {
-                                let p2 = document.createElement('physics-point');
-                                contactPoints.push(p2);
-                                p2.x = contact.contactPoint2.x;
-                                p2.y = contact.contactPoint2.y;
-                                p2.color = "orange";
-                                document.body.append(p2);
-                            }
+                        if (rect.isStatic) {
+                            rects[i].position = rects[i].position.add(collision.normal.mult(collision.depth));
+                        } else if (rects[i].isStatic) {
+                            rect.position = rect.position.sub(collision.normal.mult(collision.depth));
+                        } else {
+                            rect.position = rect.position.sub(collision.normal.mult(collision.depth / 2));
+                            rects[i].position = rects[i].position.add(collision.normal.mult(collision.depth / 2));
                         }
-                    };
-                });
-            }
+
+                        let contact = physics.Collisions.findContactPoints(rect.transformedVertices, rects[i].transformedVertices);
+                        physics.Collisions.resolvePolygonsWithRotation(
+                            rect, 
+                            rects[i], 
+                            collision.normal,
+                            collision.depth, 
+                            contact.contactPoint1, 
+                            contact.contactPoint2, 
+                            contact.contactCount
+                        )
+
+                        if (contact.contactPoint1) {
+                            let p1 = document.createElement('physics-point');
+                            document.body.append(p1);
+                            p1.x = contact.contactPoint1.x;
+                            p1.y = contact.contactPoint1.y;
+                            p1.color = "orange";
+                            contactPoints.push(p1);
+                        }
+                        if (contact.contactPoint2) {
+                            let p2 = document.createElement('physics-point');
+                            contactPoints.push(p2);
+                            p2.x = contact.contactPoint2.x;
+                            p2.y = contact.contactPoint2.y;
+                            p2.color = "orange";
+                            document.body.append(p2);
+                        }
+                    }
+                };
+            });
         })
         
         key = new inputController();
@@ -136,9 +133,9 @@
             rects[0].acceleration = physics.Vector(
                 key.left && key.right ? 0 : key.left ? -1 : key.right ? 1 : 0,
                 key.up && key.down ? 0 : key.up ? -1 : key.down ? 1 : 0,
-            ).normal.mult(500);
+            ).normal.mult(5000);
 
-            rects[0].rotationalVelocity = (key.rotateLeft && key.rotateRight ? 0 : key.rotateLeft ? -1 : key.rotateRight ? 1 : 0) / 360 * Math.PI * 100;
+            rects[0].rotationalVelocity = (key.rotateLeft && key.rotateRight ? 0 : key.rotateLeft ? -1 : key.rotateRight ? 1 : 0) / 360 * Math.PI * 500;
         });
        
         issetup = true;

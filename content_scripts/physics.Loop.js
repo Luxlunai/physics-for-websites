@@ -30,8 +30,7 @@
 
             // Call callback and reset delta
             if (this.delta > this.timeStep) {
-                this.callbacks.forEach((c) => { if(!((this.step + c.skip) % c.skip)) c.fn() });
-                this.step++;
+                this.callbacks.forEach((c) => c());
                 this.delta -= this.timeStep;
             }
 
@@ -66,8 +65,8 @@
             this.timeStep = 1000.0 / speed;
         }
 
-        onUpdate(callback, skipSteps = 1) {
-            this.callbacks.push({'fn': callback, 'skip': skipSteps});
+        onUpdate(callback) {
+            this.callbacks.push(callback);
         }
     }
 
