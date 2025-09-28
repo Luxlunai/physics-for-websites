@@ -8,6 +8,18 @@
         <div id="popup-content">
             <button id="enable-physics">enable physics</button>
             <button id="reset" type="reset">reset</button>
+            <div class="input-line">
+                <label for="set-precision">precision:</label>
+                <input id="set-precision" type="number" min="0" max="10" step="1" value="4"/>
+            </div>
+            <div class="input-line">
+                <label for="set-grav-mult">gravity-multiplier:</label>
+                <input id="set-grav-mult" type="number" min="0" max="1000" step="1" value="100"/>
+            </div>
+            <div class="input-line">
+                <label for="set-body-count">body-count:</label>
+                <input id="set-body-count" type="number" min="0" max="100" step="1" value="20"/>
+            </div>
         </div>
         <div id="error-content" class="hidden">
             <!-- <p>Can't apply physics to this web page.</p> -->

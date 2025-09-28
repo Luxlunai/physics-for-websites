@@ -1,34 +1,68 @@
-/**
- * Listen for clicks on the buttons, and send the appropriate message to
- * the content script in the page.
- */
-function listenForClicks() {
-    document.addEventListener("click", (e) => {
+function initEvents() {
+    document.getElementById("enable-physics").addEventListener("click", (e) => {
+        browser.tabs
+            .query({ active: true, currentWindow: true })
+            .then(enablePhysics)
+            .catch(reportError);
+    });
 
-        function enablePhysics(tabs) {
-            browser.tabs.sendMessage(tabs[0].id, {
-                command: "enable-physics",
-            });
-        }
-        
-        function reset(tabs) {
-            browser.tabs.sendMessage(tabs[0].id, {
-                command: "reset",
-            });
-        }
+    document.getElementById("reset").addEventListener("click", (e) => {
+        browser.tabs
+            .query({ active: true, currentWindow: true })
+            .then(reset)
+            .catch(reportError);
+    })
 
-        if (e.target.tagName !== "BUTTON" || !e.target.closest("#popup-content")) return;
-        if (e.target.type === "reset") {
-            browser.tabs
-                .query({ active: true, currentWindow: true })
-                .then(reset)
-                .catch(reportError);
-        } else {
-            browser.tabs
-                .query({ active: true, currentWindow: true })
-                .then(enablePhysics)
-                .catch(reportError);
-        }
+    document.getElementById("set-precision").addEventListener("change", (e) => {
+        browser.tabs
+            .query({ active: true, currentWindow: true })
+            .then(setPrecision)
+            .catch(reportError);
+    })
+    document.getElementById("set-grav-mult").addEventListener("change", (e) => {
+        browser.tabs
+            .query({ active: true, currentWindow: true })
+            .then(setGravMult)
+            .catch(reportError);
+    })
+    document.getElementById("set-body-count").addEventListener("change", (e) => {
+        browser.tabs
+            .query({ active: true, currentWindow: true })
+            .then(setBodyCount)
+            .catch(reportError);
+    })
+}
+
+function enablePhysics(tabs) {
+    browser.tabs.sendMessage(tabs[0].id, {
+        command: "enable-physics",
+    });
+}
+
+function reset(tabs) {
+    browser.tabs.sendMessage(tabs[0].id, {
+        command: "reset",
+    });
+}
+
+function setPrecision(tabs) {
+    browser.tabs.sendMessage(tabs[0].id, {
+        command: "set-precision",
+        value: document.getElementById("set-precision").value
+    });
+}
+
+function setGravMult(tabs) {
+    browser.tabs.sendMessage(tabs[0].id, {
+        command: "set-grav-mult",
+        value: document.getElementById("set-grav-mult").value
+    });
+}
+
+function setBodyCount(tabs) {
+    browser.tabs.sendMessage(tabs[0].id, {
+        command: "set-body-count",
+        value: document.getElementById("set-body-count").value
     });
 }
 
@@ -66,5 +100,5 @@ browser.tabs
     .catch(reportError);
 browser.tabs
     .executeScript({ file: "/content_scripts/main.js" })
-    .then(listenForClicks)
+    .then(initEvents)
     .catch(reportError);

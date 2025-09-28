@@ -88,7 +88,6 @@
             if (this.isStatic) return;
             
             this.updateNode();
-            // console.log(this.position.y - this.height / 2 + "px", this.bBox.min.y, this.node.getBoundingClientRect().y);
 
             this.velocity = this.velocity.add(gravity.div(updatesPerSecond).add(this.acceleration.div(updatesPerSecond)));
             this.position = this.position.add(this.velocity.div(updatesPerSecond));
