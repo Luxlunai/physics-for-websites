@@ -15,7 +15,6 @@
         acceleration = physics.Vector(); //physics.Vector
         rotation = 0; //float
         rotationalVelocity = 0; //float
-        angularVelocity = 0; //float
 
         mass = 0; //float
         invMass = 0; //float
@@ -23,7 +22,7 @@
         inertia = 0; //float
         invInertia = 0; //float
 
-        staticFriction = 0.6;
+        staticFriction = 1;
         dynamicFriction = 0.4;
 
         vertices = []; //physics.Vector[]
@@ -55,6 +54,9 @@
                 physics.Vector(this.width / 2, this.height / 2), //bottom-right
                 physics.Vector(-this.width / 2, this.height / 2), //bottom-left
             ]
+            this.vertices.forEach((v, i) => {
+                this.transformedVertices[i] = v.transform(this.position, this.rotation);
+            })
 
             this.html = document.createElement('physics-rect');
             document.body.append(this.html);
@@ -68,16 +70,8 @@
             this.html.borderColor = this.borderColor;
         }
 
-        update() {
-            this.velocity = this.velocity.add(this.acceleration);
-            this.position = this.position.add(this.velocity);
-            this.rotation += this.angularVelocity;
-            this.transformUpdateRequired = true;
-            // if (!this.isStatic) console.log(this.angularVelocity);
-
-            this.vertices.forEach((v, i) => {
-                this.transformedVertices[i] = v.transform(this.position, this.rotation);
-            })
+        update(updatesPerSecond = 30, gravity = physics.Vector(0, 9.81)) {
+            if (this.isStatic) return;
 
             this.html.x = this.position.x;
             this.html.y = this.position.y;
@@ -86,6 +80,15 @@
             this.html.rotation = this.rotation;
             this.html.color = this.color;
             this.html.borderColor = this.borderColor;
+
+            this.velocity = this.velocity.add(gravity.div(updatesPerSecond).add(this.acceleration.div(updatesPerSecond)));
+            this.position = this.position.add(this.velocity.div(updatesPerSecond));
+            this.rotation += this.rotationalVelocity / updatesPerSecond;
+
+            this.vertices.forEach((v, i) => {
+                this.transformedVertices[i] = v.transform(this.position, this.rotation);
+            })
+            // console.log(this.transformedVertices[0].y);
         }
     }
 

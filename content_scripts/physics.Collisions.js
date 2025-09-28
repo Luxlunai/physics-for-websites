@@ -148,6 +148,7 @@
         }
 
         static resolvePolygons(body1, body2, normal, depth) {
+
             let relativeVelocity = body2.velocity.sub(body1.velocity);
 
             if (relativeVelocity.dot(normal) > 0) return;
@@ -160,10 +161,9 @@
 
             body1.velocity = body1.velocity.sub(impulse.mult(body1.invMass));
             body2.velocity = body2.velocity.add(impulse.mult(body2.invMass));
-            console.log(impulse.mult(body1.invMass))
         }
 
-        static resolvePolygonsWithRotation(body1, body2, normal, contactPoint1, contactPoint2 = null) {
+        static resolvePolygonsWithRotation(body1, body2, normal, depth, contactPoint1, contactPoint2 = null) {
 
             let contactPoint = contactPoint2
                 ? contactPoint1.add(contactPoint2.sub(contactPoint1).div(2))
@@ -172,13 +172,15 @@
             let r1 = contactPoint.sub(body1.position);
             let r2 = contactPoint.sub(body2.position);
 
-            let r1Perp = physics.Vector(-r1.y, r1.x);
-            let r2Perp = physics.Vector(-r2.y, r2.x);
+            let r1Perp = r1.orthogonal.negative;
+            let r2Perp = r2.orthogonal.negative;
 
-            let angularVelocity1 = r1Perp.mult(body1.angularVelocity);
-            let angularVelocity2 = r2Perp.mult(body2.angularVelocity);
+            let rotationalLinearVelocity1 = r1Perp.mult(body1.rotationalVelocity);
+            let rotationalLinearVelocity2 = r2Perp.mult(body2.rotationalVelocity);
 
-            let relativeVelocity = (body2.velocity.add(angularVelocity2)).sub(body1.velocity.add(angularVelocity1));
+            let relativeVelocity1 = body1.velocity.add(rotationalLinearVelocity1);
+            let relativeVelocity2 = body2.velocity.add(rotationalLinearVelocity2);
+            let relativeVelocity = relativeVelocity2.sub(relativeVelocity1);
 
             let contactVelocityMag = relativeVelocity.dot(normal);
             if (contactVelocityMag > 0) return;
@@ -197,20 +199,14 @@
             j /= denominator;
 
             let impulse = normal.mult(j);
+            if (impulse.approxeq(physics.Vector(0, 0))) return;
 
             body1.velocity = body1.velocity.sub(impulse.mult(body1.invMass));
             body2.velocity = body2.velocity.add(impulse.mult(body2.invMass));
-            body1.angularVelocity += -r1.cross(impulse) * body1.invInertia;
-            body2.angularVelocity += r2.cross(impulse) * body2.invInertia;
+            body1.rotationalVelocity += -r1.cross(impulse) * body1.invInertia;
+            body2.rotationalVelocity += r2.cross(impulse) * body2.invInertia;
 
-            PhysicsCollisions.applyFriction(body1, body2, normal, r1, r2, r1Perp, r2Perp, relativeVelocity, j);
-            
-            // if (contactCount === 2) console.log(i, body1.velocity)
-        }
-
-
-        static applyFriction(body1, body2, normal, r1, r2, r1Perp, r2Perp, relativeVelocity, j) {
-
+            // friction:
             let tangent = relativeVelocity.sub(normal.mult(relativeVelocity.dot(normal)));
 
             if(tangent.approxeq(physics.Vector(0, 0))) return;
@@ -219,7 +215,7 @@
             let r1PerpDotT = r1Perp.dot(tangent);
             let r2PerpDotT = r2Perp.dot(tangent);
 
-            let denominator = 
+            denominator = 
                 body1.invMass + body2.invMass + 
                 ((r1PerpDotT ** 2) * body1.invInertia) + 
                 ((r2PerpDotT ** 2) * body2.invInertia);
@@ -228,18 +224,16 @@
             jt /= denominator;
 
             let frictionImpulse;
-            if (Math.abs(jt) <= j * (body1.staticFriction + body2.staticFriction) / 2) {
+            if (Math.abs(jt) <= j * ((body1.staticFriction + body2.staticFriction) / 2)) {
                 frictionImpulse = tangent.mult(jt);
             } else {
-                frictionImpulse = tangent.mult(-j * (body1.dynamicFriction + body2.dynamicFriction) / 2)
+                frictionImpulse = tangent.mult(-j * ((body1.dynamicFriction + body2.dynamicFriction) / 2))
             }
 
             body1.velocity = body1.velocity.sub(frictionImpulse.mult(body1.invMass));
             body2.velocity = body2.velocity.add(frictionImpulse.mult(body2.invMass));
-            body1.angularVelocity += -r1.cross(frictionImpulse) * body1.invInertia;
-            body2.angularVelocity += r2.cross(frictionImpulse) * body2.invInertia;
-
-            console.log(body1.inertia);
+            body1.rotationalVelocity += -r1.cross(frictionImpulse) * body1.invInertia;
+            body2.rotationalVelocity += r2.cross(frictionImpulse) * body2.invInertia;
         }
 
         /**

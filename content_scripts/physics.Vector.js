@@ -93,8 +93,8 @@
             return  this.x * vector.y - this.y * vector.x;
         }
 
-        approxeq(vector) {
-            return physics.approxeq(this.x, vector.x) && physics.approxeq(this.y, vector.y)
+        approxeq(vector, epsilon = 0.001) {
+            return physics.approxeq(this.x, vector.x, epsilon) && physics.approxeq(this.y, vector.y, epsilon)
         }
 
         get string() {
