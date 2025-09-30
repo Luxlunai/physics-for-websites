@@ -44,6 +44,7 @@
         clonedElements.forEach((clone) => {
             clone.style.opacity = 1;
         })
+        clonedElements = [];
         bodyList.forEach((body) => {
             body.node.remove();
             if (body.debugNode) body.debugNode.remove();
@@ -55,10 +56,10 @@
     function setup() {
         let wallThickness = 100;
         bodyList = [
-            physics.Bodybody(physics.Vector(window.innerWidth / 2, window.innerHeight + wallThickness / 2), window.innerWidth, wallThickness, 1, 1, true),
-            physics.Bodybody(physics.Vector(window.innerWidth / 2, 0 - wallThickness / 2), window.innerWidth, wallThickness, 1, 1, true),
-            physics.Bodybody(physics.Vector(0 - wallThickness / 2, window.innerHeight / 2), 100, window.innerHeight, wallThickness, 1, 1, true),
-            physics.Bodybody(physics.Vector(window.innerWidth + wallThickness / 2, window.innerHeight / 2), 100, window.innerHeight, wallThickness, 1, 1, true)
+            physics.BodyRect(physics.Vector(window.innerWidth / 2, window.innerHeight + wallThickness / 2), window.innerWidth, wallThickness, 1, 1, true),
+            physics.BodyRect(physics.Vector(window.innerWidth / 2, 0 - wallThickness / 2), window.innerWidth, wallThickness, 1, 1, true),
+            physics.BodyRect(physics.Vector(0 - wallThickness / 2, window.innerHeight / 2), 100, window.innerHeight, wallThickness, 1, 1, true),
+            physics.BodyRect(physics.Vector(window.innerWidth + wallThickness / 2, window.innerHeight / 2), 100, window.innerHeight, wallThickness, 1, 1, true)
         ]
 
         elements = document.querySelectorAll("body *");
@@ -72,7 +73,7 @@
             }
             if (skip) continue;
 
-            let bBox = element.getBoundingClientbody();
+            let bBox = element.getBoundingClientRect();
             if (
                 element.checkVisibility()
                 && bBox.width < window.outerWidth / 5 
