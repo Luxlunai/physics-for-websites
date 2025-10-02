@@ -127,7 +127,7 @@
 
                             // physics.Collisions.resolvePolygons(body, bodyList[i], collision.normal, collision.depth);
                             let contact = physics.Collisions.findContactPoints(body.transformedVertices, bodyList[i].transformedVertices);
-                            physics.Collisions.resolvePolygonsWithRotation(
+                            physics.resolvePolygonsWithRotation(
                                 body, 
                                 bodyList[i], 
                                 collision.normal,
