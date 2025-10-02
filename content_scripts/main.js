@@ -3,6 +3,8 @@
     window.hasRun = true;
 
     let issetup, elements = [], clonedElements = [], bodyList = [];
+    let updatesPerSecond = 60;
+
     let precision = 4;
     let gravityMult = 100;
     let bodyCount = 20;
@@ -33,7 +35,7 @@
             physics.loop.start();
         } else {
             setup();
-            physics.loop.setSpeed(60);
+            physics.loop.setSpeed(updatesPerSecond);
             physics.loop.start();
         }
     }
@@ -101,7 +103,7 @@
                         body.position = physics.Vector(window.innerWidth / 2, window.innerHeight / 2);
                         body.velocity = physics.Vector();
                     }
-                    body.update(60 * precision, physics.Vector(0, 9.81 * gravityMult));
+                    body.update(updatesPerSecond * precision, physics.Vector(0, 9.81 * gravityMult));
                 });
 
                 bodyList.forEach((body, index) => {
@@ -123,6 +125,7 @@
                                 bodyList[i].position = bodyList[i].position.add(collision.normal.mult(collision.depth / 2));
                             }
 
+                            // physics.Collisions.resolvePolygons(body, bodyList[i], collision.normal, collision.depth);
                             let contact = physics.Collisions.findContactPoints(body.transformedVertices, bodyList[i].transformedVertices);
                             physics.Collisions.resolvePolygonsWithRotation(
                                 body, 

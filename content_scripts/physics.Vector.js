@@ -10,36 +10,6 @@
             this.y = y;
         }
 
-        dist(vector) {
-            if (physics.isVector(vector)) {
-                return this.sub(vector).length;
-            } else {
-                throw new Error("incorrect value in physics.Vector.dist: " + JSON.stringify(vector));
-            }
-        }
-
-        distSq(vector) {
-            if (physics.isVector(vector)) {
-                return this.sub(vector).lengthSq;
-            } else {
-                throw new Error("incorrect value in physics.Vector.dist: " + JSON.stringify(vector));
-            }
-        }
-
-        normalize() {
-            let length = this.length;
-            this.x /= length;
-            this.y /= length;
-            return this;
-        }
-
-        transform(translationVector, rotationAngle) {
-            return new PhysicsVector(
-                Math.cos(rotationAngle) * this.x - Math.sin(rotationAngle) * this.y + translationVector.x,
-                Math.sin(rotationAngle) * this.x + Math.cos(rotationAngle) * this.y + translationVector.y
-            );
-        }
-
         add(vector) {
             if (physics.isVector(vector)) {
                 return new PhysicsVector(
@@ -84,17 +54,34 @@
             return this.x * vector.x + this.y * vector.y; 
         }
 
+        dist(vector) {
+            return this.sub(vector).length;
+        }
+
+        distSq(vector) {
+            return this.sub(vector).lengthSq;
+        }
+
+        normalize() {
+            let length = this.length;
+            this.x /= length;
+            this.y /= length;
+            return this;
+        }
+
         cross(vector) {
-            // return new PhysicsVector(
-            //     this.y * vector.z - this.z * vector.y,
-            //     this.z * vector.x - this.x * vector.z,
-            //     this.x * vector.y - this.y * vector.x
-            // )
             return  this.x * vector.y - this.y * vector.x;
         }
 
         approxeq(vector, epsilon = 0.001) {
             return physics.approxeq(this.x, vector.x, epsilon) && physics.approxeq(this.y, vector.y, epsilon)
+        }
+
+        transform(translationVector = PhysicsVector(), rotationAngle = 0) {
+            return new PhysicsVector(
+                Math.cos(rotationAngle) * this.x - Math.sin(rotationAngle) * this.y + translationVector.x,
+                Math.sin(rotationAngle) * this.x + Math.cos(rotationAngle) * this.y + translationVector.y
+            );
         }
 
         get string() {

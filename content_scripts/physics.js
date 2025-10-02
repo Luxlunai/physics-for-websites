@@ -4,48 +4,16 @@
     window.physics = class Physics {
         static Loop;
         static Vector;
-        static Particle;
         static BodyRect;
+        static BodyNode;
         static Collisions;
-        static window;
 
         static _instance;
 
         loop = null;
-        objects = [];
-        collisions = [];
 
         constructor() {
             this.loop = Physics.Loop();
-        }
-
-        // update() {
-        //     this.objects.forEach((object) => {
-        //         object.update();
-        //     });
-        //     this.collisions.forEach((c) => {
-        //         c.collidableObject.colliders.forEach((collides) => {
-        //             let vector = collides(c.physicsObject.x, c.physicsObject.y);
-        //             if (vector) {
-        //                 c.physicsObject.velocity.mult(vector);
-        //             }
-        //         }) 
-        //     });
-        // }
-
-        static add(physicsObject) {
-            Physics.instance.objects.push(physicsObject);
-        }
-
-        static remove(physicsObject) {
-            Physics.instance.objects = Physics.instance.objects.filter((object) => object !== physicsObject);
-        }
-
-        static collide(physicsObject, collidableObject) {
-            Physics.instance.collisions.push({
-                physicsObject: physicsObject,
-                collidableObject: collidableObject
-            });
         }
         
         static isVector(test) {
