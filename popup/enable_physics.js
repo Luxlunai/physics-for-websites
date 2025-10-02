@@ -85,9 +85,6 @@ function reportError(error) {
     "physics.Vector.js",
     "physics.Collisions.js",
     "physics.BodyRect.js",
-    "physics.Particle.js",
-    "physics.Spring.js",
-    "physics.window.js",
     "inputController.js",
 ].forEach((fileName) => {
     browser.tabs
